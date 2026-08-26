@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "MindTrack",
+    "slug": "mindtrack",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "mindtrack",
+    "icon": "./assets/icon.png",
+    "android": {
+      "package": "com.sevkiuzun.mindtrack",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#f7f8fa"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.sevkiuzun.mindtrack",
+      "buildNumber": "1",
+      "supportsTablet": true
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#f7f8fa",
+          "imageWidth": 200
+        }
+      ]
+    ],
+    "extra": {
+      "privacyPolicyUrl": "https://YOUR-DOMAIN.example/mindtrack/privacy",
+      "supportUrl": "https://YOUR-DOMAIN.example/mindtrack/support",
+      "eas": {
+        "projectId": "ba7feea4-d7db-4258-995d-c490a36efbe3"
+      }
+    }
+  }
+}
