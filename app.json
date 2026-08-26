@@ -18,7 +18,10 @@
     "ios": {
       "bundleIdentifier": "com.sevkiuzun.mindtrack",
       "buildNumber": "1",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "plugins": [
       "expo-sqlite",
@@ -34,8 +37,8 @@
       ]
     ],
     "extra": {
-      "privacyPolicyUrl": "https://YOUR-DOMAIN.example/mindtrack/privacy",
-      "supportUrl": "https://YOUR-DOMAIN.example/mindtrack/support",
+      "privacyPolicyUrl": "https://msuzun.github.io/Mindtrack-WebPages/Privacy/",
+      "supportUrl": "https://msuzun.github.io/Mindtrack-WebPages/Support/",
       "eas": {
         "projectId": "ba7feea4-d7db-4258-995d-c490a36efbe3"
       }

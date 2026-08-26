@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { BottomTabs } from './src/components/BottomTabs';
 import { initDatabase } from './src/db/database';
@@ -9,7 +10,7 @@ import { TodayScreen } from './src/screens/TodayScreen';
 import { AboutScreen } from './src/screens/AboutScreen';
 import { useAppStore } from './src/store/useAppStore';
 import { toLocalDateKey } from './src/utils/date';
-
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 export default function App() {
   const { tab, setTab, loadDay } = useAppStore();
   const [ready, setReady] = useState(false);
@@ -29,32 +30,43 @@ export default function App() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.center}>
-        <Text style={styles.errorTitle}>Veritabanı başlatılamadı</Text>
-        <Text>{error}</Text>
-      </SafeAreaView>
+      <SafeAreaProvider>
+
+        <SafeAreaView style={styles.center}>
+          <Text style={styles.errorTitle}>Veritabanı başlatılamadı</Text>
+          <Text>{error}</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
+
     );
   }
 
   if (!ready) {
     return (
-      <SafeAreaView style={styles.center}>
-        <Text style={styles.loading}>MindTrack hazırlanıyor…</Text>
-      </SafeAreaView>
+      <SafeAreaProvider>
+
+        <SafeAreaView style={styles.center}>
+          <Text style={styles.loading}>MindTrack hazırlanıyor…</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
+
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar style="dark" />
-      <View style={styles.body}>
-        {tab === 'today' && <TodayScreen />}
-        {tab === 'plan' && <PlanScreen />}
-        {tab === 'progress' && <ProgressScreen />}
-        {tab === 'about' && <AboutScreen />}
-      </View>
-      <BottomTabs active={tab} onChange={setTab} />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safe}>
+        <StatusBar style="dark" />
+        <View style={styles.body}>
+          {tab === 'today' && <TodayScreen />}
+          {tab === 'plan' && <PlanScreen />}
+          {tab === 'progress' && <ProgressScreen />}
+          {tab === 'about' && <AboutScreen />}
+        </View>
+        <BottomTabs active={tab} onChange={setTab} />
+      </SafeAreaView>
+    </SafeAreaProvider>
+
   );
 }
 
