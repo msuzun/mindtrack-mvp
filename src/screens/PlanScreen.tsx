@@ -1,11 +1,11 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
+import { colors, radii, spacing } from '../theme';
 import { addDays, toLocalDateKey } from '../utils/date';
 
 export function PlanScreen() {
   const { selectedDate, setSelectedDate, setTab } = useAppStore();
   const today = toLocalDateKey();
-
   const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
 
   const openDay = (date: string) => {
@@ -14,29 +14,42 @@ export function PlanScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Text style={styles.eyebrow}>HAFTALIK GÖRÜNÜM</Text>
       <Text style={styles.title}>Plan</Text>
       <Text style={styles.subtitle}>
-        MVP'de günlük planlar otomatik üretilir. Haftalık görünümden istediğin güne geçebilirsin.
+        Günlük planların otomatik hazırlanır. İncelemek istediğin günü seç.
       </Text>
 
       <Text style={styles.section}>Önümüzdeki 7 Gün</Text>
-
-      {days.map((date, index) => (
-        <Pressable
-          key={date}
-          onPress={() => openDay(date)}
-          style={[styles.day, selectedDate === date && styles.selected]}
-        >
-          <View>
-            <Text style={styles.dayTitle}>{index === 0 ? 'Bugün' : `Gün +${index}`}</Text>
-            <Text style={styles.date}>{date}</Text>
-          </View>
-          <Text style={styles.arrow}>›</Text>
-        </Pressable>
-      ))}
+      {days.map((date, index) => {
+        const isSelected = selectedDate === date;
+        return (
+          <Pressable
+            key={date}
+            onPress={() => openDay(date)}
+            accessibilityRole="button"
+            accessibilityLabel={(index === 0 ? 'Bugün' : 'Gün +' + index) + ', ' + date}
+            style={({ pressed }) => [
+              styles.day, isSelected && styles.selected, pressed && styles.pressed,
+            ]}
+          >
+            <View style={[styles.dayIndex, isSelected && styles.dayIndexSelected]}>
+              <Text style={[styles.dayIndexText, isSelected && styles.dayIndexTextSelected]}>
+                {index + 1}
+              </Text>
+            </View>
+            <View style={styles.dayContent}>
+              <Text style={styles.dayTitle}>{index === 0 ? 'Bugün' : 'Gün +' + index}</Text>
+              <Text style={styles.date}>{date}</Text>
+            </View>
+            <Text style={[styles.arrow, isSelected && styles.arrowSelected]}>›</Text>
+          </Pressable>
+        );
+      })}
 
       <View style={styles.info}>
+        <Text style={styles.infoEyebrow}>YOL HARİTASI</Text>
         <Text style={styles.infoTitle}>Yıllık yapı</Text>
         <Text style={styles.infoText}>
           Yıl → Ay → Hafta → Gün → Görev hiyerarşisi sonraki iterasyonda
@@ -49,65 +62,35 @@ export function PlanScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 18,
-    paddingBottom: 32,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '900',
-    color: '#171a21',
-  },
-  subtitle: {
-    marginTop: 8,
-    color: '#6c7280',
-    lineHeight: 20,
-  },
-  section: {
-    marginTop: 28,
-    marginBottom: 10,
-    fontSize: 17,
-    fontWeight: '900',
-  },
+  content: { paddingHorizontal: spacing.screen, paddingTop: 22, paddingBottom: 36 },
+  eyebrow: { color: colors.accent, fontSize: 10, fontWeight: '700', letterSpacing: 1.3 },
+  title: { marginTop: 7, fontSize: 30, lineHeight: 38, fontWeight: '700', color: colors.text },
+  subtitle: { marginTop: 6, color: colors.muted, lineHeight: 21, fontSize: 14 },
+  section: { marginTop: 28, marginBottom: 12, color: colors.text, fontSize: 16, fontWeight: '700' },
   day: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e6e8ec',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 10,
-    flexDirection: 'row',
+    minHeight: 76, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    borderRadius: radii.card, padding: 14, marginBottom: 10, flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
-  selected: {
-    borderColor: '#252a34',
-    borderWidth: 2,
+  selected: { borderColor: colors.accent, backgroundColor: colors.surfaceRaised },
+  pressed: { opacity: 0.75, transform: [{ scale: 0.99 }] },
+  dayIndex: {
+    width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.background,
   },
-  dayTitle: {
-    fontWeight: '900',
-    fontSize: 16,
-  },
-  date: {
-    marginTop: 3,
-    color: '#747a85',
-  },
-  arrow: {
-    fontSize: 30,
-    color: '#838995',
-  },
+  dayIndexSelected: { backgroundColor: colors.accent },
+  dayIndexText: { color: colors.muted, fontWeight: '700' },
+  dayIndexTextSelected: { color: colors.background },
+  dayContent: { flex: 1, marginLeft: 13 },
+  dayTitle: { color: colors.text, fontWeight: '700', fontSize: 15 },
+  date: { marginTop: 3, color: colors.muted, fontSize: 12 },
+  arrow: { fontSize: 28, color: colors.muted },
+  arrowSelected: { color: colors.accent },
   info: {
-    marginTop: 22,
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: '#eef0f3',
+    marginTop: 18, padding: spacing.card, borderRadius: radii.card,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
   },
-  infoTitle: {
-    fontWeight: '900',
-    marginBottom: 6,
-  },
-  infoText: {
-    color: '#606672',
-    lineHeight: 20,
-  },
+  infoEyebrow: { color: colors.success, fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  infoTitle: { color: colors.text, fontWeight: '700', fontSize: 17, marginTop: 6, marginBottom: 7 },
+  infoText: { color: colors.muted, lineHeight: 21, fontSize: 13 },
 });

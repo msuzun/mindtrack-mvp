@@ -1,40 +1,35 @@
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ensureTasksForRange, getStats } from '../db/database';
+import { colors, radii, spacing } from '../theme';
 import { PeriodStats } from '../types';
-import {
-  endOfWeek,
-  monthRange,
-  startOfWeek,
-  toLocalDateKey,
-  yearRange,
-} from '../utils/date';
+import { endOfWeek, monthRange, startOfWeek, toLocalDateKey, yearRange } from '../utils/date';
 
 const emptyStats: PeriodStats = {
-  total: 0,
-  completed: 0,
-  completionRate: 0,
-  plannedMinutes: 0,
-  completedMinutes: 0,
+  total: 0, completed: 0, completionRate: 0, plannedMinutes: 0, completedMinutes: 0,
 };
 
-function StatCard({
-  title,
-  stats,
-}: {
-  title: string;
-  stats: PeriodStats;
-}) {
+function StatCard({ title, stats }: { title: string; stats: PeriodStats }) {
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.big}>%{stats.completionRate}</Text>
-      <Text style={styles.meta}>
-        {stats.completed}/{stats.total} görev
-      </Text>
-      <Text style={styles.meta}>
-        {stats.completedMinutes}/{stats.plannedMinutes} dk
-      </Text>
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.big}>%{stats.completionRate}</Text>
+      </View>
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${stats.completionRate}%` as `${number}%` }]} />
+      </View>
+      <View style={styles.metaRow}>
+        <View>
+          <Text style={styles.metaLabel}>GÖREV</Text>
+          <Text style={styles.metaValue}>{stats.completed}/{stats.total}</Text>
+        </View>
+        <View style={styles.metaDivider} />
+        <View>
+          <Text style={styles.metaLabel}>SÜRE</Text>
+          <Text style={styles.metaValue}>{stats.completedMinutes}/{stats.plannedMinutes} dk</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -47,15 +42,11 @@ export function ProgressScreen() {
   useEffect(() => {
     void (async () => {
       const today = toLocalDateKey();
-
-      // MVP'de gelecek 7 günlük kayıtları oluştur; geçmiş günler zaten kullanım sırasında oluşur.
       await ensureTasksForRange(today, 7);
-
       const weekStart = startOfWeek(today);
       const weekEnd = endOfWeek(today);
       const [monthStart, monthEnd] = monthRange(today);
       const [yearStart, yearEnd] = yearRange(today);
-
       setWeek(await getStats(weekStart, weekEnd));
       setMonth(await getStats(monthStart, monthEnd));
       setYear(await getStats(yearStart, yearEnd));
@@ -63,12 +54,12 @@ export function ProgressScreen() {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Text style={styles.eyebrow}>PERFORMANS ÖZETİ</Text>
       <Text style={styles.title}>İlerleme</Text>
       <Text style={styles.subtitle}>
-        Streak yerine tamamlama oranını da gösteriyoruz; bir kötü gün bütün ilerlemeyi sıfırlamaz.
+        Tamamlama oranı gelişimini görünür kılar; tek bir kötü gün bütün ilerlemeyi sıfırlamaz.
       </Text>
-
       <StatCard title="Bu Hafta" stats={week} />
       <StatCard title="Bu Ay" stats={month} />
       <StatCard title="Bu Yıl" stats={year} />
@@ -77,41 +68,24 @@ export function ProgressScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 18,
-    paddingBottom: 32,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '900',
-    color: '#171a21',
-  },
-  subtitle: {
-    marginTop: 8,
-    marginBottom: 20,
-    color: '#6c7280',
-    lineHeight: 20,
-  },
+  content: { paddingHorizontal: spacing.screen, paddingTop: 22, paddingBottom: 36 },
+  eyebrow: { color: colors.accent, fontSize: 10, fontWeight: '700', letterSpacing: 1.3 },
+  title: { marginTop: 7, fontSize: 30, lineHeight: 38, fontWeight: '700', color: colors.text },
+  subtitle: { marginTop: 6, marginBottom: 22, color: colors.muted, lineHeight: 21, fontSize: 14 },
   card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e6e8ec',
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 12,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    borderRadius: radii.card, padding: spacing.card, marginBottom: 12,
   },
-  cardTitle: {
-    fontWeight: '900',
-    fontSize: 16,
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  cardTitle: { color: colors.text, fontWeight: '700', fontSize: 16 },
+  big: { fontSize: 30, fontWeight: '700', color: colors.accent },
+  progressTrack: {
+    height: 7, borderRadius: radii.pill, backgroundColor: colors.background,
+    overflow: 'hidden', marginTop: 14,
   },
-  big: {
-    fontSize: 38,
-    fontWeight: '900',
-    marginTop: 8,
-    color: '#171a21',
-  },
-  meta: {
-    color: '#6c7280',
-    marginTop: 3,
-  },
+  progressFill: { height: '100%', borderRadius: radii.pill, backgroundColor: colors.success },
+  metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
+  metaDivider: { width: 1, height: 30, backgroundColor: colors.border, marginHorizontal: 22 },
+  metaLabel: { color: colors.muted, fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  metaValue: { color: colors.text, fontSize: 14, fontWeight: '600', marginTop: 3 },
 });

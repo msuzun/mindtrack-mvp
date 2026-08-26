@@ -1,12 +1,16 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { colors, radii, spacing } from '../theme';
 
 export function AboutScreen() {
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Hakkında & Gizlilik</Text>
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Text style={styles.eyebrow}>MINDTRACK 1.0.0</Text>
+      <Text style={styles.title}>Hakkında</Text>
+      <Text style={styles.subtitle}>Sade, güvenli ve tamamen sana ait.</Text>
 
       <View style={styles.card}>
-        <Text style={styles.heading}>MindTrack 1.0.0</Text>
+        <View style={styles.iconBadge}><Text style={styles.icon}>M</Text></View>
+        <Text style={styles.heading}>Günlük odağın için</Text>
         <Text style={styles.text}>
           MindTrack; günlük hafıza, bilişsel gelişim ve odak/dua çalışmalarını
           cihaz üzerinde takip etmek için hazırlanmış çevrimdışı bir uygulamadır.
@@ -14,12 +18,14 @@ export function AboutScreen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.heading}>Gizlilik</Text>
+        <Text style={styles.cardEyebrow}>GİZLİLİK</Text>
+        <Text style={styles.heading}>Verilerin cihazında kalır</Text>
         <Text style={styles.text}>
           Bu sürüm kullanıcı hesabı oluşturmaz, reklam göstermez ve analiz SDK'sı
           içermez. Görev ve ilerleme kayıtları yalnızca cihazdaki yerel SQLite
           veritabanında tutulur. Uygulama bu verileri kendi sunucusuna göndermez.
         </Text>
+        <View style={styles.divider} />
         <Text style={styles.text}>
           Uygulamayı kaldırmanız halinde işletim sistemi yerel uygulama verilerini
           de silebilir. Bu sürümde bulut yedekleme veya hesap senkronizasyonu yoktur.
@@ -27,6 +33,7 @@ export function AboutScreen() {
       </View>
 
       <View style={styles.card}>
+        <Text style={styles.cardEyebrow}>BİLGİLENDİRME</Text>
         <Text style={styles.heading}>Tıbbi / Psikolojik iddia</Text>
         <Text style={styles.text}>
           Uygulama bir sağlık hizmeti veya tanı aracı değildir. Bilişsel egzersizler
@@ -39,16 +46,21 @@ export function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 18, paddingBottom: 32 },
-  title: { fontSize: 30, fontWeight: '900', color: '#171a21', marginBottom: 18 },
+  content: { paddingHorizontal: spacing.screen, paddingTop: 22, paddingBottom: 36 },
+  eyebrow: { color: colors.accent, fontSize: 10, fontWeight: '700', letterSpacing: 1.3 },
+  title: { marginTop: 7, fontSize: 30, lineHeight: 38, fontWeight: '700', color: colors.text },
+  subtitle: { marginTop: 5, marginBottom: 22, color: colors.muted, lineHeight: 21 },
   card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e6e8ec',
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 12,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    borderRadius: radii.card, padding: spacing.card, marginBottom: 12,
   },
-  heading: { fontSize: 17, fontWeight: '900', marginBottom: 8, color: '#171a21' },
-  text: { color: '#606672', lineHeight: 21, marginBottom: 8 },
+  iconBadge: {
+    width: 42, height: 42, alignItems: 'center', justifyContent: 'center',
+    borderRadius: 13, backgroundColor: colors.accent, marginBottom: 14,
+  },
+  icon: { color: colors.background, fontSize: 20, fontWeight: '800' },
+  cardEyebrow: { color: colors.success, fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 7 },
+  heading: { fontSize: 17, lineHeight: 24, fontWeight: '700', marginBottom: 8, color: colors.text },
+  text: { color: colors.muted, lineHeight: 21, fontSize: 13 },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: 14 },
 });
