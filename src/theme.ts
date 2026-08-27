@@ -5,6 +5,7 @@ export const darkColors = {
   overlay: 'rgba(15, 23, 42, 0.82)', modalOverlay: 'rgba(2, 6, 23, 0.82)',
   shadow: '#000000', completedSurface: 'rgba(30, 41, 59, 0.72)',
   completedBorder: 'rgba(16, 185, 129, 0.45)', onAccent: '#0f172a',
+  heatmapLow: '#6ee7b7', heatmapMedium: '#34d399',
 } as const;
 
 export const lightColors = {
@@ -14,6 +15,7 @@ export const lightColors = {
   overlay: 'rgba(248, 250, 252, 0.94)', modalOverlay: 'rgba(15, 23, 42, 0.45)',
   shadow: '#0f172a', completedSurface: '#f0fdf4',
   completedBorder: 'rgba(5, 150, 105, 0.38)', onAccent: '#ffffff',
+  heatmapLow: '#a7f3d0', heatmapMedium: '#34d399',
 } as const;
 
 export type ThemeMode = 'system' | 'dark' | 'light';

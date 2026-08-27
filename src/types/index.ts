@@ -28,3 +28,15 @@ export type PeriodStats = {
   plannedMinutes: number;
   completedMinutes: number;
 };
+
+export type DailyCompletionStats = {
+  date: string;
+  total: number;
+  completed: number;
+  completionRate: number;
+};
+
+export type ActivityDay = {
+  date: string;
+  completed: number;
+};
