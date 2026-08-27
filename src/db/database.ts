@@ -2,6 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import {
   ActivityDay, Category, CategoryTag, DailyCompletionStats, Goal, GoalOverview,
   GoalStatus, PeriodStats, PriorityLevel, Routine, RoutineFrequency, Task,
+  TrainingSession,
 } from '../types';
 
 const dbPromise = SQLite.openDatabaseAsync('mindtrack.db');
@@ -148,7 +149,31 @@ async function initializeDatabase() {
     );
     CREATE INDEX IF NOT EXISTS idx_focus_sessions_instance
     ON focus_sessions(task_instance_id, completed_at);
+
+    CREATE TABLE IF NOT EXISTS training_sessions (
+      id TEXT PRIMARY KEY NOT NULL,
+      task_instance_id TEXT,
+      session_type TEXT NOT NULL CHECK (session_type IN ('memory','cognitive','mindfulness','free_focus')),
+      total_items INTEGER,
+      correct_count INTEGER,
+      incorrect_count INTEGER,
+      duration_seconds INTEGER NOT NULL DEFAULT 0 CHECK (duration_seconds >= 0),
+      accuracy_rate REAL,
+      rating INTEGER CHECK (rating IS NULL OR rating BETWEEN 1 AND 5),
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (task_instance_id) REFERENCES task_instances(id) ON DELETE SET NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_training_sessions_task_created
+    ON training_sessions(task_instance_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_training_sessions_type_created
+    ON training_sessions(session_type, created_at);
   `);
+
+  await db.runAsync(
+    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.2.0')
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`
+  );
 
   const now = new Date().toISOString();
   for (let index = 0; index < defaultRoutines.length; index++) {
@@ -277,6 +302,20 @@ export async function saveFocusSession(taskId: string, durationSeconds: number) 
   await db.runAsync(
     'INSERT INTO focus_sessions (task_instance_id, duration_minutes, completed_at) VALUES (?, ?, ?)',
     taskId, Math.max(1, Math.round(durationSeconds / 60)), new Date().toISOString()
+  );
+}
+
+export async function insertTrainingSession(session: TrainingSession) {
+  await initDatabase();
+  const db = await dbPromise;
+  await db.runAsync(
+    `INSERT INTO training_sessions (
+      id, task_instance_id, session_type, total_items, correct_count, incorrect_count,
+      duration_seconds, accuracy_rate, rating, notes, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    session.id, session.taskInstanceId, session.sessionType, session.totalItems,
+    session.correctCount, session.incorrectCount, session.durationSeconds,
+    session.accuracyRate, session.rating, session.notes, session.createdAt
   );
 }
 

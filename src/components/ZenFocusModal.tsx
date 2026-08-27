@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Modal, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,13 +27,14 @@ function formatTime(totalSeconds: number) {
 export function ZenFocusModal({ task, onClose, onComplete }: {
   task: Task;
   onClose: () => void;
-  onComplete: () => Promise<void> | void;
+  onComplete: (durationSeconds: number) => Promise<void> | void;
 }) {
   useKeepAwake('mindtrack-focus-session');
   const insets = useSafeAreaInsets();
   const styles = useThemedStyles(createStyles);
   const timer = useFocusTimer(task.id, task.targetMinutes === 15 || task.targetMinutes === 45 ? task.targetMinutes : 25);
   const [finishing, setFinishing] = useState(false);
+  const finishingRef = useRef(false);
 
   const requestClose = () => {
     if (!timer.running && timer.elapsedSeconds() === 0) {
@@ -47,16 +48,23 @@ export function ZenFocusModal({ task, onClose, onComplete }: {
   };
 
   const complete = async () => {
-    if (finishing) return;
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     setFinishing(true);
     try {
-      await timer.recordSession();
-      await onComplete();
+      const durationSeconds = timer.elapsedSeconds();
+      await timer.recordSession(durationSeconds);
+      await onComplete(durationSeconds);
       onClose();
     } finally {
+      finishingRef.current = false;
       setFinishing(false);
     }
   };
+
+  useEffect(() => {
+    if (timer.finished) void complete();
+  }, [timer.finished]);
 
   return (
     <Modal visible animationType="fade" presentationStyle="fullScreen" onRequestClose={requestClose} statusBarTranslucent>

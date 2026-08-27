@@ -3,6 +3,7 @@ export type CategoryTag = 'focus' | 'personal' | 'work' | 'routine';
 export type PriorityLevel = 0 | 1 | 2;
 export type GoalStatus = 'active' | 'completed' | 'archived';
 export type RoutineFrequency = 'daily' | 'specific_days' | 'interval';
+export type TrainingSessionType = 'memory' | 'cognitive' | 'mindfulness' | 'free_focus';
 
 export type Goal = {
   id: string;
@@ -46,6 +47,22 @@ export type Task = TaskInstance & {
   date: string;
   completed: boolean;
 };
+
+export type TrainingSession = {
+  id: string;
+  taskInstanceId: string | null;
+  sessionType: TrainingSessionType;
+  totalItems: number | null;
+  correctCount: number | null;
+  incorrectCount: number | null;
+  durationSeconds: number;
+  accuracyRate: number | null;
+  rating: number | null;
+  notes: string | null;
+  createdAt: string;
+};
+
+export type CreateTrainingSessionInput = Omit<TrainingSession, 'id' | 'accuracyRate' | 'createdAt'>;
 
 export type GoalOverview = Goal & {
   progress: number;
