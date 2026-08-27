@@ -1,12 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../theme';
 
-export type Tab = 'today' | 'plan' | 'progress' | 'about';
+export type Tab = 'today' | 'plan' | 'progress' | 'settings' | 'about';
 
 const tabs: Array<{ key: Tab; label: string; icon: string }> = [
   { key: 'today', label: 'Bugün', icon: '✓' },
   { key: 'plan', label: 'Plan', icon: '□' },
   { key: 'progress', label: 'İlerleme', icon: '↗' },
+  { key: 'settings', label: 'Ayarlar', icon: '⚙' },
   { key: 'about', label: 'Hakkında', icon: 'i' },
 ];
 

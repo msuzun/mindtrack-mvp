@@ -6,8 +6,9 @@ import {
   setTaskCompleted,
 } from '../db/database';
 import { toLocalDateKey } from '../utils/date';
+import { NotificationService } from '../services/NotificationService';
 
-type Tab = 'today' | 'plan' | 'progress' | 'about';
+type Tab = 'today' | 'plan' | 'progress' | 'settings' | 'about';
 
 type AppState = {
   tab: Tab;
@@ -43,5 +44,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleTask: async (task) => {
     await setTaskCompleted(task.id, !task.completed);
     await get().loadDay(task.date);
+    await NotificationService.refreshSchedule();
   },
 }));
