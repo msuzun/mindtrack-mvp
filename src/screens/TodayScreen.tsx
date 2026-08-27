@@ -5,6 +5,7 @@ import { TaskCard } from '../components/TaskCard';
 import { ZenFocusModal } from '../components/ZenFocusModal';
 import { TaskCustomizationModal } from '../components/TaskCustomizationModal';
 import { useAppStore } from '../store/useAppStore';
+import { useTodayTasks } from '../hooks/useTodayTasks';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 import { Task } from '../types';
@@ -12,7 +13,8 @@ import { Task } from '../types';
 export function TodayScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
-  const { tasks, loading, toggleTask, selectedDate, setTab, loadDay } = useAppStore();
+  const { tasks, loading, toggleTask, selectedDate, loadDay } = useTodayTasks();
+  const setTab = useAppStore((state) => state.setTab);
   const [focusedTask, setFocusedTask] = useState<Task | null>(null);
   const [customizingTask, setCustomizingTask] = useState<Task | null>(null);
 

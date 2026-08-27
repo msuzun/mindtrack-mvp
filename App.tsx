@@ -5,7 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabs } from './src/components/BottomTabs';
 import { initDatabase } from './src/db/database';
 import { AboutScreen } from './src/screens/AboutScreen';
-import { PlanScreen } from './src/screens/PlanScreen';
+import { GoalsScreen } from './src/screens/GoalsScreen';
 import { ProgressScreen } from './src/screens/ProgressScreen';
 import { TodayScreen } from './src/screens/TodayScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
@@ -102,7 +102,7 @@ function AppContent() {
         />
         <View style={styles.body}>
           {tab === 'today' && <TodayScreen />}
-          {tab === 'plan' && <PlanScreen />}
+          {tab === 'goals' && <GoalsScreen />}
           {tab === 'progress' && <ProgressScreen />}
           {tab === 'settings' && <SettingsScreen />}
           {tab === 'about' && <AboutScreen />}

@@ -1,12 +1,12 @@
 import { Linking, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import {
-  ensureTasksForDate,
   getIncompleteTaskCount,
   getReminderSettings,
   ReminderSettings,
   saveReminderSettings,
 } from '../db/database';
+import { RoutineSchedulerEngine } from './RoutineSchedulerEngine';
 import { addDays, toLocalDateKey } from '../utils/date';
 
 const CHANNEL_ID = 'daily-reminders';
@@ -101,7 +101,7 @@ export const NotificationService = {
       if (triggerDate.getTime() <= Date.now()) continue;
 
       const dateKey = addDays(toLocalDateKey(), offset);
-      await ensureTasksForDate(dateKey);
+      await RoutineSchedulerEngine.materializeDate(dateKey);
       const incomplete = await getIncompleteTaskCount(dateKey);
       const body = incomplete > 0
         ? `Bugün tamamlanmayı bekleyen ${incomplete} görevin var. Zihnini tazelemeye hazır mısın?`
