@@ -7,7 +7,7 @@ export function AboutScreen() {
   const styles = useThemedStyles(createStyles);
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <Text style={styles.eyebrow}>MINDTRACK 1.0.0</Text>
+      <Text style={styles.eyebrow}>MINDTRACK 1.4.0</Text>
       <Text style={styles.title}>Hakkında</Text>
       <Text style={styles.subtitle}>Sade, güvenli ve tamamen sana ait.</Text>
 
