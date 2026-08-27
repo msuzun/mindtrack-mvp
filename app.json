@@ -4,7 +4,7 @@
     "slug": "mindtrack",
     "version": "1.2.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "scheme": "mindtrack",
     "icon": "./assets/icon.png",
     "android": {

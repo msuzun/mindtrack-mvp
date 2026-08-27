@@ -1,7 +1,10 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { colors, radii, spacing } from '../theme';
+import { radii, spacing, ThemeColors } from '../theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
 export function AboutScreen() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <Text style={styles.eyebrow}>MINDTRACK 1.0.0</Text>
@@ -45,11 +48,11 @@ export function AboutScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   content: { paddingHorizontal: spacing.screen, paddingTop: 22, paddingBottom: 36 },
   eyebrow: { color: colors.accent, fontSize: 10, fontWeight: '700', letterSpacing: 1.3 },
-  title: { marginTop: 7, fontSize: 30, lineHeight: 38, fontWeight: '700', color: colors.text },
-  subtitle: { marginTop: 5, marginBottom: 22, color: colors.muted, lineHeight: 21 },
+  title: { marginTop: 7, fontSize: 30, lineHeight: 38, fontWeight: '700', color: colors.textPrimary },
+  subtitle: { marginTop: 5, marginBottom: 22, color: colors.textMuted, lineHeight: 21 },
   card: {
     backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
     borderRadius: radii.card, padding: spacing.card, marginBottom: 12,
@@ -58,9 +61,9 @@ const styles = StyleSheet.create({
     width: 42, height: 42, alignItems: 'center', justifyContent: 'center',
     borderRadius: 13, backgroundColor: colors.accent, marginBottom: 14,
   },
-  icon: { color: colors.background, fontSize: 20, fontWeight: '800' },
+  icon: { color: colors.onAccent, fontSize: 20, fontWeight: '800' },
   cardEyebrow: { color: colors.success, fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 7 },
-  heading: { fontSize: 17, lineHeight: 24, fontWeight: '700', marginBottom: 8, color: colors.text },
-  text: { color: colors.muted, lineHeight: 21, fontSize: 13 },
+  heading: { fontSize: 17, lineHeight: 24, fontWeight: '700', marginBottom: 8, color: colors.textPrimary },
+  text: { color: colors.textMuted, lineHeight: 21, fontSize: 13 },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 14 },
 });

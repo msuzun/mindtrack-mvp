@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radii } from '../theme';
+import { radii, ThemeColors } from '../theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 import { Task } from '../types';
 
 const categoryLabel = {
@@ -9,6 +10,8 @@ const categoryLabel = {
 };
 
 export function TaskCard({ task, onToggle }: { task: Task; onToggle: () => void }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   return (
     <Pressable
       onPress={onToggle}
@@ -34,13 +37,13 @@ export function TaskCard({ task, onToggle }: { task: Task; onToggle: () => void 
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     backgroundColor: colors.surface, borderRadius: radii.card, padding: 18, marginBottom: 12,
-    borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOpacity: 0.14,
+    borderWidth: 1, borderColor: colors.border, shadowColor: colors.shadow, shadowOpacity: 0.14,
     shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 2,
   },
-  doneCard: { borderColor: 'rgba(16, 185, 129, 0.45)', backgroundColor: 'rgba(30, 41, 59, 0.72)' },
+  doneCard: { borderColor: colors.completedBorder, backgroundColor: colors.completedSurface },
   pressed: { opacity: 0.78, transform: [{ scale: 0.99 }] },
   row: { flexDirection: 'row', alignItems: 'flex-start' },
   checkbox: {
@@ -48,13 +51,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginTop: 1,
   },
   checkboxDone: { backgroundColor: colors.success, borderColor: colors.success },
-  check: { color: colors.text, fontWeight: '800', fontSize: 16 },
+  check: { color: colors.onAccent, fontWeight: '800', fontSize: 16 },
   content: { flex: 1, marginHorizontal: 13 },
   category: { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: colors.accent, marginBottom: 5 },
   categoryDone: { color: colors.success },
-  title: { fontSize: 16, fontWeight: '700', lineHeight: 23, color: colors.text },
-  doneText: { color: colors.muted, textDecorationLine: 'line-through' },
-  description: { marginTop: 5, lineHeight: 20, color: colors.muted, fontSize: 13 },
+  title: { fontSize: 16, fontWeight: '700', lineHeight: 23, color: colors.textPrimary },
+  doneText: { color: colors.textMuted, textDecorationLine: 'line-through' },
+  description: { marginTop: 5, lineHeight: 20, color: colors.textMuted, fontSize: 13 },
   timeBadge: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: radii.pill, backgroundColor: colors.surfaceRaised },
-  minutes: { fontSize: 11, fontWeight: '700', color: colors.muted },
+  minutes: { fontSize: 11, fontWeight: '700', color: colors.textMuted },
 });
