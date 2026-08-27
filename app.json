@@ -2,14 +2,14 @@
   "expo": {
     "name": "MindTrack",
     "slug": "mindtrack",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "mindtrack",
     "icon": "./assets/app-icons/icon-zen-blue.png",
     "android": {
       "package": "com.sevkiuzun.mindtrack",
-      "versionCode": 24,
+      "versionCode": 25,
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.SCHEDULE_EXACT_ALARM"

@@ -6,6 +6,21 @@ export type RoutineFrequency = 'daily' | 'specific_days' | 'interval';
 export type TrainingSessionType = 'memory' | 'cognitive' | 'mindfulness' | 'free_focus';
 export type SmartSuggestionType = 'difficulty_increase' | 'difficulty_decrease' | 'reschedule' | 'load_balance';
 export type SmartSuggestionStatus = 'pending' | 'accepted' | 'dismissed';
+export type NotificationTone = 'gentle' | 'balanced' | 'energetic';
+export type NotificationCategory = 'memory' | 'cognitive' | 'general';
+
+export type NotificationSettings = {
+  enabled: boolean;
+  hour: number;
+  minute: number;
+  tone: NotificationTone;
+  quietHoursStart: string;
+  quietHoursEnd: string;
+  autoReduceFrequency: boolean;
+  ignoredCount: number;
+  enabledCategories: NotificationCategory[];
+  lastAppOpenedAt: string | null;
+};
 
 export type Goal = {
   id: string;

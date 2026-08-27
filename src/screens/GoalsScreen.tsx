@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { GoalCard } from '../components/GoalCard';
 import { createGoal, getGoalsOverview } from '../db/database';
+import { SmartNotificationScheduler } from '../services/SmartNotificationScheduler';
 import { useAppStore } from '../store/useAppStore';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
@@ -53,6 +54,7 @@ function CreateGoalModal({ visible, onClose, onSaved }: { visible: boolean; onCl
     if (!title.trim() || saving) return; setSaving(true);
     try {
       await createGoal({ title, description, targetDate: /^\d{4}-\d{2}-\d{2}$/.test(targetDate) ? targetDate : null, routineTitle, frequencyType: frequency, daysOfWeek: days });
+      await SmartNotificationScheduler.rescheduleNext();
       setTitle(''); setDescription(''); setTargetDate(''); setRoutineTitle(''); setFrequency('daily'); setDays([]);
       await onSaved(); onClose();
     } finally { setSaving(false); }

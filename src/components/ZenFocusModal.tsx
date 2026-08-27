@@ -7,6 +7,7 @@ import { radii, ThemeColors } from '../theme';
 import { useThemedStyles } from '../theme/ThemeProvider';
 import { Task } from '../types';
 import { ZenBreathingCanvas } from './ZenBreathingCanvas';
+import { SmartNotificationScheduler } from '../services/SmartNotificationScheduler';
 
 const MODES: Array<{ value: FocusTimerMode; label: string }> = [
   { value: 15, label: '15 dk' },
@@ -43,7 +44,10 @@ export function ZenFocusModal({ task, onClose, onComplete }: {
     }
     Alert.alert('Odak seansından çıkılsın mı?', 'Kaydedilmemiş süre sona erecek.', [
       { text: 'Odakta Kal', style: 'cancel' },
-      { text: 'Çık', style: 'destructive', onPress: onClose },
+      { text: 'Çık', style: 'destructive', onPress: () => {
+        if (timer.elapsedSeconds() > 0) void SmartNotificationScheduler.scheduleInterruptedFocus(task.id, task.title, task.category);
+        onClose();
+      } },
     ]);
   };
 

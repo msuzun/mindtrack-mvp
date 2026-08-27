@@ -16,6 +16,8 @@ import { SmartSuggestionBanner } from '../components/SmartSuggestionBanner';
 import { SmartSuggestion } from '../types';
 import { TimeBudget, useTimeBudgetFilter } from '../hooks/useTimeBudgetFilter';
 import { HapticService } from '../services/HapticService';
+import { BestNextStepCard } from '../components/BestNextStepCard';
+import { getBestNextTask } from '../db/database';
 
 const TIME_FILTERS: Array<{ value: TimeBudget; label: string }> = [
   { value: null, label: 'Tümü' }, { value: 15, label: '15 dk' }, { value: 30, label: '30 dk' }, { value: 45, label: '45 dk' },
@@ -35,6 +37,7 @@ export function TodayScreen() {
   const [timeBudget, setTimeBudget] = useState<TimeBudget>(null);
   const [suggestion, setSuggestion] = useState<SmartSuggestion | null>(null);
   const [suggestionBusy, setSuggestionBusy] = useState(false);
+  const [bestNextTask, setBestNextTask] = useState<Task | null>(null);
   const { visibleTasks, hiddenCount, capacityMode } = useTimeBudgetFilter(tasks, timeBudget);
 
   useEffect(() => {
@@ -43,6 +46,8 @@ export function TodayScreen() {
     void SmartPlanningEngine.evaluate(selectedDate).then((next) => { if (active) setSuggestion(next); });
     return () => { active = false; };
   }, [loading, selectedDate]);
+
+  useEffect(() => { if (!loading) void getBestNextTask(selectedDate).then(setBestNextTask); }, [loading, selectedDate, tasks]);
 
   const applySuggestion = async (strategy?: 'today' | 'next_light') => {
     if (!suggestion || suggestionBusy) return;
@@ -118,6 +123,8 @@ export function TodayScreen() {
         <View style={styles.filterRow}>{TIME_FILTERS.map((item) => <Pressable key={String(item.value)} onPress={() => setTimeBudget(item.value)} style={[styles.filterChip, timeBudget === item.value && styles.filterChipActive]}><Text style={[styles.filterText, timeBudget === item.value && styles.filterTextActive]}>{item.label}</Text></Pressable>)}</View>
         {timeBudget != null && <Text style={styles.filterHint}>{hiddenCount > 0 ? `${hiddenCount} düşük etkili görev geçici olarak gizlendi.` : 'Seçilen süreye uygun görevlerin hazır.'}</Text>}
       </View>
+
+      <BestNextStepCard task={bestNextTask} onStart={setFocusedTask} />
 
       {suggestion && <SmartSuggestionBanner suggestion={suggestion} busy={suggestionBusy} onApply={() => void applySuggestion('today')} onAlternative={() => void applySuggestion('next_light')} onDismiss={() => void dismissSuggestion()} />}
 
