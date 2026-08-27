@@ -6,6 +6,8 @@ export const darkColors = {
   shadow: '#000000', completedSurface: 'rgba(30, 41, 59, 0.72)',
   completedBorder: 'rgba(16, 185, 129, 0.45)', onAccent: '#0f172a',
   heatmapLow: '#6ee7b7', heatmapMedium: '#34d399',
+  illustrationLine: '#94a3b8', illustrationGlowPrimary: 'rgba(56, 189, 248, 0.12)',
+  illustrationGlowSecondary: 'rgba(16, 185, 129, 0.10)', illustrationFill: 'rgba(148, 163, 184, 0.08)',
 } as const;
 
 export const lightColors = {
@@ -16,6 +18,8 @@ export const lightColors = {
   shadow: '#0f172a', completedSurface: '#f0fdf4',
   completedBorder: 'rgba(5, 150, 105, 0.38)', onAccent: '#ffffff',
   heatmapLow: '#a7f3d0', heatmapMedium: '#34d399',
+  illustrationLine: '#64748b', illustrationGlowPrimary: 'rgba(2, 132, 199, 0.08)',
+  illustrationGlowSecondary: 'rgba(5, 150, 105, 0.08)', illustrationFill: 'rgba(100, 116, 139, 0.06)',
 } as const;
 
 export type ThemeMode = 'system' | 'dark' | 'light';

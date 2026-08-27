@@ -1,4 +1,5 @@
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { EmptyStateView } from '../components/EmptyStateView';
 import { TaskCard } from '../components/TaskCard';
 import { useAppStore } from '../store/useAppStore';
 import { radii, spacing, ThemeColors } from '../theme';
@@ -7,7 +8,7 @@ import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 export function TodayScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
-  const { tasks, loading, toggleTask, selectedDate } = useAppStore();
+  const { tasks, loading, toggleTask, selectedDate, setTab } = useAppStore();
 
   const completed = tasks.filter((x) => x.completed).length;
   const total = tasks.length;
@@ -34,24 +35,34 @@ export function TodayScreen() {
         <Text style={styles.subtitle}>Odağını koru, küçük adımlarla ilerle.</Text>
       </View>
 
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryRow}>
-          <View>
-            <Text style={styles.summaryLabel}>GÜNLÜK İLERLEME</Text>
-            <Text style={styles.summaryValue}>{completed}/{total} görev</Text>
+      {total > 0 && (
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryRow}>
+            <View>
+              <Text style={styles.summaryLabel}>GÜNLÜK İLERLEME</Text>
+              <Text style={styles.summaryValue}>{completed}/{total} görev</Text>
+            </View>
+            <Text style={styles.percent}>%{percent}</Text>
           </View>
-          <Text style={styles.percent}>%{percent}</Text>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${percent}%` as `${number}%` }]} />
+          </View>
+          <Text style={styles.minutes}>{completedMinutes}/{totalMinutes} dakika tamamlandı</Text>
         </View>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${percent}%` as `${number}%` }]} />
-        </View>
-        <Text style={styles.minutes}>{completedMinutes}/{totalMinutes} dakika tamamlandı</Text>
-      </View>
+      )}
 
-      <Text style={styles.sectionTitle}>Bugünkü görevler</Text>
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} onToggle={() => void toggleTask(task)} />
-      ))}
+      {total === 0 ? (
+        <EmptyStateView type="empty" />
+      ) : completed === total ? (
+        <EmptyStateView type="completed" onAction={() => setTab('progress')} />
+      ) : (
+        <>
+          <Text style={styles.sectionTitle}>Bugünkü görevler</Text>
+          {tasks.map((task) => (
+            <TaskCard key={task.id} task={task} onToggle={() => void toggleTask(task)} />
+          ))}
+        </>
+      )}
     </ScrollView>
   );
 }
