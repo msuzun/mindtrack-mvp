@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { getReminderSettings, ReminderSettings } from '../db/database';
 import { NotificationService } from '../services/NotificationService';
+import { HapticService } from '../services/HapticService';
 import { radii, spacing, ThemeColors, ThemeMode } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
@@ -17,14 +18,17 @@ export function SettingsScreen() {
   const [draftHour, setDraftHour] = useState(9);
   const [draftMinute, setDraftMinute] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
 
   useEffect(() => {
     void (async () => {
       const saved = await getReminderSettings();
       const permission = await NotificationService.getPermissionStatus();
+      const savedHaptics = await HapticService.getEnabled();
       setSettings(saved);
       setPermissionDenied(saved.enabled && !permission.granted);
       setCanAskAgain(permission.canAskAgain);
+      setHapticsEnabled(savedHaptics);
     })();
   }, []);
 
@@ -74,8 +78,8 @@ export function SettingsScreen() {
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <Text style={styles.kicker}>AYARLAR</Text>
-      <Text style={styles.title}>Günlük Hatırlatıcılar</Text>
-      <Text style={styles.subtitle}>Hatırlatmalar yalnızca bu cihazda planlanır. Hiçbir veri gönderilmez.</Text>
+      <Text style={styles.title}>Ayarlar</Text>
+      <Text style={styles.subtitle}>Görünüm, bildirim ve etkileşim tercihlerini yalnızca bu cihazda yönet.</Text>
 
       <Text style={styles.sectionTitle}>Görünüm / Tema</Text>
       <View style={styles.segmentedControl} accessibilityRole="radiogroup">
@@ -111,6 +115,21 @@ export function SettingsScreen() {
           </View>
           <Text style={styles.time}>{twoDigits(settings.hour)}:{twoDigits(settings.minute)}</Text>
         </Pressable>
+      </View>
+
+      <Text style={styles.sectionTitle}>Etkileşim</Text>
+      <View style={[styles.card, styles.interactionCard]}>
+        <View style={styles.row}>
+          <View style={styles.rowText}>
+            <Text style={styles.label}>Titreşim / Haptic Geri Bildirim</Text>
+            <Text style={styles.help}>Görev etkileşimlerinde hafif dokunsal geri bildirim verir.</Text>
+          </View>
+          <Switch value={hapticsEnabled} onValueChange={(value) => {
+            setHapticsEnabled(value);
+            void HapticService.setEnabled(value);
+          }} trackColor={{ false: colors.border, true: colors.accent }} thumbColor={colors.textPrimary}
+            accessibilityLabel="Dokunsal geri bildirimi aç veya kapat" />
+        </View>
       </View>
 
       {permissionDenied && (
@@ -170,6 +189,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   segmentText: { color: colors.textMuted, fontSize: 13, fontWeight: '700' },
   segmentTextSelected: { color: colors.onAccent },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radii.card, padding: spacing.card },
+  interactionCard: { marginBottom: 16 },
   row: { flexDirection: 'row', alignItems: 'center' }, rowText: { flex: 1, paddingRight: 14 },
   label: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' }, help: { color: colors.textMuted, fontSize: 12, lineHeight: 18, marginTop: 4 },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 18 },

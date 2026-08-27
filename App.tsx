@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, AppState, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import * as SystemUI from 'expo-system-ui';
 import { BottomTabs } from './src/components/BottomTabs';
 import { initDatabase } from './src/db/database';
 import { AboutScreen } from './src/screens/AboutScreen';
@@ -21,10 +20,6 @@ function AppContent() {
   const { tab, setTab, loadDay } = useAppStore();
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    void SystemUI.setBackgroundColorAsync(colors.background);
-  }, [colors.background]);
 
   useEffect(() => {
     void (async () => {

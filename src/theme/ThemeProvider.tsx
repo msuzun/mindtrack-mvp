@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
+import { getAppSetting, setAppSetting } from '../db/database';
 import { darkColors, lightColors, ResolvedTheme, ThemeColors, ThemeMode } from '../theme';
 
 const STORAGE_KEY = '@mindtrack/theme-mode';
@@ -22,7 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    void AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
+    void getAppSetting(STORAGE_KEY).then((saved) => {
       if (!active) return;
       if (saved === 'system' || saved === 'dark' || saved === 'light') setModeState(saved);
       setReady(true);
@@ -32,7 +32,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setMode = useCallback(async (nextMode: ThemeMode) => {
     setModeState(nextMode);
-    await AsyncStorage.setItem(STORAGE_KEY, nextMode);
+    await setAppSetting(STORAGE_KEY, nextMode);
   }, []);
 
   const resolvedTheme: ResolvedTheme = mode === 'system'
