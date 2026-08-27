@@ -28,6 +28,11 @@ async function tableExists(db: SQLite.SQLiteDatabase, name: string) {
   return Boolean(await db.getFirstAsync(`SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?`, name));
 }
 
+async function ensureColumn(db: SQLite.SQLiteDatabase, table: string, column: string, definition: string) {
+  const columns = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(${table})`);
+  if (!columns.some((item) => item.name === column)) await db.execAsync(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+
 async function migrateV1(db: SQLite.SQLiteDatabase) {
   if (!(await tableExists(db, 'tasks'))) return;
   const columns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(tasks)');
@@ -168,10 +173,23 @@ async function initializeDatabase() {
     ON training_sessions(task_instance_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_training_sessions_type_created
     ON training_sessions(session_type, created_at);
+
+    CREATE TABLE IF NOT EXISTS smart_suggestions (
+      id TEXT PRIMARY KEY NOT NULL,
+      type TEXT NOT NULL CHECK (type IN ('difficulty_increase','difficulty_decrease','reschedule','load_balance')),
+      payload TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted','dismissed')),
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_smart_suggestions_status_created
+    ON smart_suggestions(status, created_at);
   `);
 
+  await ensureColumn(db, 'routines', 'default_item_count', 'INTEGER NOT NULL DEFAULT 30');
+  await ensureColumn(db, 'routines', 'estimated_duration_minutes', 'INTEGER NOT NULL DEFAULT 20');
+
   await db.runAsync(
-    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.2.0')
+    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.4.0')
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`
   );
 
@@ -333,6 +351,8 @@ function mapRoutine(row: any): Routine {
     id: row.id, goalId: row.goal_id, title: row.title, frequencyType: row.frequency_type,
     daysOfWeek: days, targetTime: row.target_time, intervalDays: row.interval_days ?? 1,
     isActive: row.is_active === 1, createdAt: row.created_at,
+    defaultItemCount: row.default_item_count ?? 30,
+    estimatedDurationMinutes: row.estimated_duration_minutes ?? row.target_minutes ?? 20,
   };
 }
 
