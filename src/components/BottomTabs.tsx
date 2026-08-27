@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme';
+import { ThemeColors } from '../theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
 export type Tab = 'today' | 'plan' | 'progress' | 'settings' | 'about';
 
@@ -12,6 +13,8 @@ const tabs: Array<{ key: Tab; label: string; icon: string }> = [
 ];
 
 export function BottomTabs({ active, onChange }: { active: Tab; onChange: (tab: Tab) => void }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.shell}>
       <View style={styles.container}>
@@ -37,7 +40,7 @@ export function BottomTabs({ active, onChange }: { active: Tab; onChange: (tab: 
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   shell: {
     paddingHorizontal: 12, paddingTop: 8, paddingBottom: 10, borderTopWidth: 1,
     borderTopColor: colors.border, backgroundColor: colors.overlay,
@@ -46,7 +49,7 @@ const styles = StyleSheet.create({
   item: { flex: 1, minHeight: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
   activeItem: { backgroundColor: colors.surfaceRaised },
   pressed: { opacity: 0.72 },
-  icon: { color: colors.muted, fontSize: 16, fontWeight: '700', lineHeight: 18 },
-  label: { color: colors.muted, fontWeight: '600', fontSize: 11, marginTop: 3 },
+  icon: { color: colors.textMuted, fontSize: 16, fontWeight: '700', lineHeight: 18 },
+  label: { color: colors.textMuted, fontWeight: '600', fontSize: 11, marginTop: 3 },
   activeLabel: { color: colors.accent },
 });

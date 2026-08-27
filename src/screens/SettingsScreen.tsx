@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { getReminderSettings, ReminderSettings } from '../db/database';
 import { NotificationService } from '../services/NotificationService';
-import { colors, radii, spacing } from '../theme';
+import { radii, spacing, ThemeColors, ThemeMode } from '../theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
 const twoDigits = (value: number) => String(value).padStart(2, '0');
 
 export function SettingsScreen() {
+  const { colors, mode, setMode } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const [settings, setSettings] = useState<ReminderSettings | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [canAskAgain, setCanAskAgain] = useState(true);
@@ -74,6 +77,21 @@ export function SettingsScreen() {
       <Text style={styles.title}>Günlük Hatırlatıcılar</Text>
       <Text style={styles.subtitle}>Hatırlatmalar yalnızca bu cihazda planlanır. Hiçbir veri gönderilmez.</Text>
 
+      <Text style={styles.sectionTitle}>Görünüm / Tema</Text>
+      <View style={styles.segmentedControl} accessibilityRole="radiogroup">
+        {([
+          ['system', 'Sistem'], ['dark', 'Koyu'], ['light', 'Açık'],
+        ] as Array<[ThemeMode, string]>).map(([value, label]) => {
+          const selected = mode === value;
+          return <Pressable key={value} onPress={() => void setMode(value)} accessibilityRole="radio"
+            accessibilityState={{ checked: selected }} style={[styles.segment, selected && styles.segmentSelected]}>
+            <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>{label}</Text>
+          </Pressable>;
+        })}
+      </View>
+
+      <Text style={styles.sectionTitle}>Bildirimler</Text>
+
       <View style={styles.card}>
         <View style={styles.row}>
           <View style={styles.rowText}>
@@ -81,7 +99,7 @@ export function SettingsScreen() {
             <Text style={styles.help}>Her gün belirlediğin saatte odağını tazele.</Text>
           </View>
           <Switch value={settings.enabled} onValueChange={(value) => void toggleReminder(value)} disabled={saving}
-            trackColor={{ false: colors.border, true: colors.accent }} thumbColor={colors.text}
+            trackColor={{ false: colors.border, true: colors.accent }} thumbColor={colors.textPrimary}
             accessibilityLabel="Günlük hatırlatıcıları aç veya kapat" />
         </View>
         <View style={styles.divider} />
@@ -126,6 +144,8 @@ export function SettingsScreen() {
 function NumberPicker({ label, value, max, step = 1, onChange }: {
   label: string; value: number; max: number; step?: number; onChange: (value: number) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const change = (direction: number) => {
     const next = value + direction * step;
     onChange(next < 0 ? max : next > max ? 0 : next);
@@ -138,30 +158,36 @@ function NumberPicker({ label, value, max, step = 1, onChange }: {
   </View>;
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   loader: { marginTop: 60 }, content: { paddingHorizontal: spacing.screen, paddingTop: 26, paddingBottom: 40 },
   kicker: { color: colors.accent, fontSize: 11, fontWeight: '700', letterSpacing: 1.2 },
-  title: { color: colors.text, fontSize: 29, fontWeight: '700', marginTop: 8 },
-  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginTop: 7, marginBottom: 24 },
+  title: { color: colors.textPrimary, fontSize: 29, fontWeight: '700', marginTop: 8 },
+  subtitle: { color: colors.textMuted, fontSize: 14, lineHeight: 21, marginTop: 7, marginBottom: 24 },
+  sectionTitle: { color: colors.textMuted, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 9 },
+  segmentedControl: { flexDirection: 'row', padding: 4, marginBottom: 24, borderRadius: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  segment: { flex: 1, alignItems: 'center', paddingVertical: 11, borderRadius: 10 },
+  segmentSelected: { backgroundColor: colors.accent },
+  segmentText: { color: colors.textMuted, fontSize: 13, fontWeight: '700' },
+  segmentTextSelected: { color: colors.onAccent },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radii.card, padding: spacing.card },
   row: { flexDirection: 'row', alignItems: 'center' }, rowText: { flex: 1, paddingRight: 14 },
-  label: { color: colors.text, fontSize: 16, fontWeight: '700' }, help: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 4 },
+  label: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' }, help: { color: colors.textMuted, fontSize: 12, lineHeight: 18, marginTop: 4 },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 18 },
   timeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   time: { color: colors.accent, fontSize: 24, fontWeight: '700', marginLeft: 12 }, pressed: { opacity: 0.7 },
   notice: { marginTop: 16, padding: 16, borderRadius: radii.card, backgroundColor: colors.surfaceRaised, borderWidth: 1, borderColor: colors.border },
-  noticeTitle: { color: colors.text, fontSize: 14, fontWeight: '700' }, noticeText: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 5 },
+  noticeTitle: { color: colors.textPrimary, fontSize: 14, fontWeight: '700' }, noticeText: { color: colors.textMuted, fontSize: 13, lineHeight: 19, marginTop: 5 },
   settingsButton: { alignSelf: 'flex-start', marginTop: 12, paddingVertical: 9, paddingHorizontal: 12, backgroundColor: colors.accent, borderRadius: 10 },
-  settingsButtonText: { color: colors.background, fontWeight: '700', fontSize: 12 },
-  modalOverlay: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: 'rgba(2, 6, 23, 0.82)' },
+  settingsButtonText: { color: colors.onAccent, fontWeight: '700', fontSize: 12 },
+  modalOverlay: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: colors.modalOverlay },
   modalCard: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: 20, padding: 22 },
-  modalTitle: { color: colors.text, fontSize: 20, fontWeight: '700', textAlign: 'center' },
+  modalTitle: { color: colors.textPrimary, fontSize: 20, fontWeight: '700', textAlign: 'center' },
   pickerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 24 }, numberPicker: { alignItems: 'center' },
-  pickerLabel: { color: colors.muted, fontSize: 11, fontWeight: '700', marginBottom: 8 },
+  pickerLabel: { color: colors.textMuted, fontSize: 11, fontWeight: '700', marginBottom: 8 },
   pickerButton: { width: 48, height: 38, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceRaised, borderRadius: 10 },
   pickerButtonText: { color: colors.accent, fontSize: 22, lineHeight: 25 },
-  pickerValue: { color: colors.text, fontSize: 36, fontWeight: '700', marginVertical: 10, minWidth: 64, textAlign: 'center' },
-  colon: { color: colors.muted, fontSize: 30, marginHorizontal: 8, marginTop: 20 }, actions: { flexDirection: 'row', gap: 10 },
-  secondaryButton: { flex: 1, alignItems: 'center', padding: 13, borderRadius: 11, borderWidth: 1, borderColor: colors.border }, secondaryText: { color: colors.muted, fontWeight: '700' },
-  primaryButton: { flex: 1, alignItems: 'center', padding: 13, borderRadius: 11, backgroundColor: colors.accent }, primaryText: { color: colors.background, fontWeight: '700' },
+  pickerValue: { color: colors.textPrimary, fontSize: 36, fontWeight: '700', marginVertical: 10, minWidth: 64, textAlign: 'center' },
+  colon: { color: colors.textMuted, fontSize: 30, marginHorizontal: 8, marginTop: 20 }, actions: { flexDirection: 'row', gap: 10 },
+  secondaryButton: { flex: 1, alignItems: 'center', padding: 13, borderRadius: 11, borderWidth: 1, borderColor: colors.border }, secondaryText: { color: colors.textMuted, fontWeight: '700' },
+  primaryButton: { flex: 1, alignItems: 'center', padding: 13, borderRadius: 11, backgroundColor: colors.accent }, primaryText: { color: colors.onAccent, fontWeight: '700' },
 });
