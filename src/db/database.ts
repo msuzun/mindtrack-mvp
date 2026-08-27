@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import { Category, PeriodStats, Task } from '../types';
+import { ActivityDay, Category, DailyCompletionStats, PeriodStats, Task } from '../types';
 import { addDays } from '../utils/date';
 
 const dbPromise = SQLite.openDatabaseAsync('mindtrack.db');
@@ -273,4 +273,42 @@ export async function getStats(start: string, end: string): Promise<PeriodStats>
     plannedMinutes: row?.planned_minutes ?? 0,
     completedMinutes: row?.completed_minutes ?? 0,
   };
+}
+
+export async function getWeeklyStats(start: string, end: string): Promise<DailyCompletionStats[]> {
+  const db = await dbPromise;
+  const rows = await db.getAllAsync<{
+    date: string;
+    total: number;
+    completed: number;
+  }>(
+    `SELECT date, COUNT(*) AS total, COALESCE(SUM(completed), 0) AS completed
+     FROM tasks
+     WHERE date BETWEEN ? AND ?
+     GROUP BY date
+     ORDER BY date`,
+    start,
+    end
+  );
+
+  return rows.map((row) => ({
+    date: row.date,
+    total: row.total,
+    completed: row.completed,
+    completionRate: row.total === 0 ? 0 : Math.round((row.completed / row.total) * 100),
+  }));
+}
+
+export async function getActivityHeatmapData(start: string, end: string): Promise<ActivityDay[]> {
+  const db = await dbPromise;
+  return db.getAllAsync<ActivityDay>(
+    `SELECT date(completed_at, 'localtime') AS date, COUNT(*) AS completed
+     FROM tasks
+     WHERE completed_at IS NOT NULL
+       AND date(completed_at, 'localtime') BETWEEN ? AND ?
+     GROUP BY date(completed_at, 'localtime')
+     ORDER BY date(completed_at, 'localtime')`,
+    start,
+    end
+  );
 }
