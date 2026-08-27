@@ -8,6 +8,29 @@ export type SmartSuggestionType = 'difficulty_increase' | 'difficulty_decrease' 
 export type SmartSuggestionStatus = 'pending' | 'accepted' | 'dismissed';
 export type NotificationTone = 'gentle' | 'balanced' | 'energetic';
 export type NotificationCategory = 'memory' | 'cognitive' | 'general';
+export type ProgramCategory = 'memory' | 'focus' | 'logic' | 'mindfulness';
+export type ProgramLevel = 'beginner' | 'intermediate' | 'advanced';
+export type ProgramEnrollmentStatus = 'active' | 'paused' | 'completed';
+
+export type ProgramRoutineTemplate = {
+  id: string; title: string; description: string; category: Category;
+  daysOfWeek: number[]; targetMinutes: number; itemCount?: number;
+};
+export type ProgramWeekTemplate = { week: number; title: string; description: string; routines: ProgramRoutineTemplate[] };
+export type ProgramDefinition = {
+  id: string; title: string; description: string; category: ProgramCategory;
+  durationWeeks: number; level: ProgramLevel; curriculum: ProgramWeekTemplate[];
+};
+export type UserEnrolledProgram = {
+  id: string; programId: string; goalId: string; startDate: string; currentWeek: number;
+  status: ProgramEnrollmentStatus; pausedAt: string | null; completedAt: string | null;
+  title: string; description: string; category: ProgramCategory; durationWeeks: number; level: ProgramLevel;
+  weekCompleted: number; weekTotal: number;
+};
+export type ProgramGraduationSummary = {
+  enrollmentId: string; title: string; totalItems: number; focusMinutes: number;
+  accuracyChange: number | null; badge: string;
+};
 
 export type NotificationSettings = {
   enabled: boolean;
@@ -43,6 +66,10 @@ export type Routine = {
   createdAt: string;
   defaultItemCount: number;
   estimatedDurationMinutes: number;
+  programEnrollmentId?: string | null;
+  programWeek?: number | null;
+  programStartDate?: string | null;
+  programStatus?: ProgramEnrollmentStatus | null;
 };
 
 export type SmartSuggestion = {

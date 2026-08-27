@@ -1,0 +1,53 @@
+[
+  {
+    "id": "memory-kickstart-30", "title": "30 Gün Hafıza Başlangıç", "description": "Çağrışım ve sayı-şekil teknikleriyle hatırlama kapasiteni adım adım geliştir.", "category": "memory", "durationWeeks": 4, "level": "beginner",
+    "curriculum": [
+      { "week": 1, "title": "Çağrışım Temelleri", "description": "10 öğeyle güçlü ve canlı çağrışımlar kur.", "routines": [{ "id": "association", "title": "Aktif Çağrışım", "description": "10 öğeyi görsel çağrışımlarla eşleştir.", "category": "memory", "daysOfWeek": [1,2,3,4,5,6], "targetMinutes": 15, "itemCount": 10 }] },
+      { "week": 2, "title": "Sayı ve Şekil", "description": "Sayıları kalıcı görsel çapalara dönüştür.", "routines": [{ "id": "number-shape", "title": "Sayı-Şekil Eşleme", "description": "15 sayıyı görsel nesnelerle eşleştir.", "category": "memory", "daysOfWeek": [1,2,3,4,5,6], "targetMinutes": 20, "itemCount": 15 }] },
+      { "week": 3, "title": "Bağlama Zinciri", "description": "Öğeleri akıcı bir hikâyeye bağla.", "routines": [{ "id": "linking", "title": "Hafıza Zinciri", "description": "20 öğelik bir bağlantı hikâyesi oluştur.", "category": "memory", "daysOfWeek": [1,2,3,4,5,6], "targetMinutes": 20, "itemCount": 20 }] },
+      { "week": 4, "title": "Kalıcı Geri Çağırma", "description": "Gecikmeli hatırlamayla 25 öğeye ulaş.", "routines": [{ "id": "recall", "title": "Gecikmeli Geri Çağırma", "description": "25 öğeyi aralıklı olarak geri çağır.", "category": "memory", "daysOfWeek": [1,2,3,4,5,6,7], "targetMinutes": 25, "itemCount": 25 }] }
+    ]
+  },
+  {
+    "id": "memory-palace-8", "title": "8 Hafta Memory Palace", "description": "Zihinsel rotalardan soyut kavramların uzun süreli saklanmasına ilerle.", "category": "memory", "durationWeeks": 8, "level": "intermediate",
+    "curriculum": [
+      { "week": 1, "title": "Rota Oluşturma", "description": "Tanıdık bir mekânda 10 durak seç.", "routines": [{ "id": "route", "title": "Zihinsel Rota", "description": "Rotanı gez ve durakları sırayla çağır.", "category": "memory", "daysOfWeek": [1,3,5,7], "targetMinutes": 20, "itemCount": 10 }] },
+      { "week": 2, "title": "Canlı Yerleştirme", "description": "Nesneleri duraklara sıra dışı imgelerle yerleştir.", "routines": [{ "id": "placement", "title": "Saray Yerleştirme", "description": "15 nesneyi rotana yerleştir.", "category": "memory", "daysOfWeek": [1,2,4,6], "targetMinutes": 25, "itemCount": 15 }] },
+      { "week": 3, "title": "Oda Çıkarma", "description": "Rotayı ayrıntılı odalara genişlet.", "routines": [{ "id": "rooms", "title": "Oda Genişletme", "description": "Her odada yeni sabit noktalar çıkar.", "category": "memory", "daysOfWeek": [1,3,5,7], "targetMinutes": 25, "itemCount": 20 }] },
+      { "week": 4, "title": "Soyut Kavramlar", "description": "Soyut bilgileri somut imgelere çevir.", "routines": [{ "id": "abstract", "title": "Kavramı Nesneleştir", "description": "Soyut kavramları canlı nesnelere dönüştür.", "category": "memory", "daysOfWeek": [1,2,4,6], "targetMinutes": 30, "itemCount": 20 }] },
+      { "week": 5, "title": "Çift Rota", "description": "İkinci bağımsız sarayını kur.", "routines": [{ "id": "second-route", "title": "İkinci Saray", "description": "Yeni bir rotayı kodla ve test et.", "category": "memory", "daysOfWeek": [1,3,5,7], "targetMinutes": 30, "itemCount": 25 }] },
+      { "week": 6, "title": "Hızlı Kodlama", "description": "Yerleştirme hızını artır.", "routines": [{ "id": "speed", "title": "Hızlı Yerleştirme", "description": "25 öğeyi süre tutarak yerleştir.", "category": "memory", "daysOfWeek": [1,2,4,6], "targetMinutes": 30, "itemCount": 25 }] },
+      { "week": 7, "title": "Uzun Süreli Saklama", "description": "Aralıklı tekrar rotası uygula.", "routines": [{ "id": "retention", "title": "Saray Tekrarı", "description": "Eski rotaları gecikmeli geri çağır.", "category": "memory", "daysOfWeek": [1,3,5,7], "targetMinutes": 30, "itemCount": 30 }] },
+      { "week": 8, "title": "Ustalık Rotası", "description": "Tüm teknikleri tek parkurda birleştir.", "routines": [{ "id": "mastery", "title": "Ustalık Turu", "description": "40 öğelik final rotasını tamamla.", "category": "memory", "daysOfWeek": [1,2,3,4,5,6,7], "targetMinutes": 35, "itemCount": 40 }] }
+    ]
+  },
+  {
+    "id": "deep-focus-30", "title": "30 Gün Odak Geliştirme", "description": "Dikkat dağıtıcıları yöneterek 15 dakikadan 45 dakikalık derin bloklara ilerle.", "category": "focus", "durationWeeks": 4, "level": "beginner",
+    "curriculum": [
+      { "week": 1, "title": "15 Dakika Tek Görev", "description": "Kısa ve temiz odak blokları kur.", "routines": [{ "id": "focus-15", "title": "15 Dk Zen Odak", "description": "Tek görev, bildirim yok, nazik başlangıç.", "category": "cognitive", "daysOfWeek": [1,2,3,4,5], "targetMinutes": 15 }] },
+      { "week": 2, "title": "Dikkat Dağıtıcı Yönetimi", "description": "Bölünmeleri fark et ve geri dön.", "routines": [{ "id": "focus-25", "title": "25 Dk Kesintisiz Odak", "description": "Dikkat dağıtıcıları not edip devam et.", "category": "cognitive", "daysOfWeek": [1,2,3,4,5], "targetMinutes": 25 }] },
+      { "week": 3, "title": "Derinleşme", "description": "35 dakikalık sürdürülebilir bloklar.", "routines": [{ "id": "focus-35", "title": "35 Dk Derin Odak", "description": "Tek bir anlamlı çıktıya odaklan.", "category": "cognitive", "daysOfWeek": [1,2,3,4,5], "targetMinutes": 35 }] },
+      { "week": 4, "title": "Akış Bloğu", "description": "45 dakikalık derin çalışma ritmi.", "routines": [{ "id": "focus-45", "title": "45 Dk Akış", "description": "Hazırlık, derin çalışma ve kısa kapanış.", "category": "cognitive", "daysOfWeek": [1,2,3,4,5,6], "targetMinutes": 45 }] }
+    ]
+  },
+  {
+    "id": "cognitive-agility-6", "title": "6 Hafta Mantık & Problem Çözme", "description": "Desen tanıma, analitik muhakeme ve hız becerilerini geliştir.", "category": "logic", "durationWeeks": 6, "level": "intermediate",
+    "curriculum": [
+      { "week": 1, "title": "Desenleri Gör", "description": "Görsel ve sayısal örüntüleri tanı.", "routines": [{ "id": "patterns", "title": "Desen Tanıma", "description": "10 örüntü sorusu çöz.", "category": "cognitive", "daysOfWeek": [1,3,5], "targetMinutes": 20, "itemCount": 10 }] },
+      { "week": 2, "title": "Analitik Ayrıştırma", "description": "Problemleri küçük önermelere ayır.", "routines": [{ "id": "analysis", "title": "Analitik Muhakeme", "description": "Önermeleri adım adım çözümle.", "category": "cognitive", "daysOfWeek": [1,3,5,7], "targetMinutes": 25, "itemCount": 12 }] },
+      { "week": 3, "title": "Çıkarım", "description": "Koşullu çıkarımları hızlandır.", "routines": [{ "id": "deduction", "title": "Mantıksal Çıkarım", "description": "15 çıkarım sorusu çöz.", "category": "cognitive", "daysOfWeek": [1,2,4,6], "targetMinutes": 25, "itemCount": 15 }] },
+      { "week": 4, "title": "Alternatif Strateji", "description": "Aynı probleme farklı yollardan yaklaş.", "routines": [{ "id": "strategies", "title": "Çözüm Stratejileri", "description": "Üç zor problemi iki yöntemle çöz.", "category": "cognitive", "daysOfWeek": [1,3,5,7], "targetMinutes": 30, "itemCount": 6 }] },
+      { "week": 5, "title": "Hız ve İsabet", "description": "Süre baskısında doğruluğu koru.", "routines": [{ "id": "speed-logic", "title": "Hızlı Mantık", "description": "20 soruluk süreli seti tamamla.", "category": "cognitive", "daysOfWeek": [1,2,4,6], "targetMinutes": 30, "itemCount": 20 }] },
+      { "week": 6, "title": "Bilişsel Çeviklik", "description": "Tüm becerileri karma sette birleştir.", "routines": [{ "id": "agility", "title": "Çeviklik Finali", "description": "25 soruluk karma final seti.", "category": "cognitive", "daysOfWeek": [1,2,3,4,5,6], "targetMinutes": 35, "itemCount": 25 }] }
+    ]
+  },
+  {
+    "id": "mindfulness-calm", "title": "Meditasyon & Zihinsel Dinginlik", "description": "Nefes odağı ve zihinsel temizlik rutinleriyle sakin bir temel kur.", "category": "mindfulness", "durationWeeks": 4, "level": "beginner",
+    "curriculum": [
+      { "week": 1, "title": "Nefese Dön", "description": "Beş dakikalık nefes farkındalığı.", "routines": [{ "id": "breath-5", "title": "5 Dk Nefes", "description": "Nefesini değiştirmeden izle.", "category": "spiritual", "daysOfWeek": [1,2,3,4,5,6,7], "targetMinutes": 5 }] },
+      { "week": 2, "title": "Bedeni Tara", "description": "Bedensel duyumları yargılamadan gözle.", "routines": [{ "id": "body-scan", "title": "Beden Taraması", "description": "Dikkatini bedende yavaşça gezdir.", "category": "spiritual", "daysOfWeek": [1,2,3,4,5,6,7], "targetMinutes": 7 }] },
+      { "week": 3, "title": "Düşünceyi Bırak", "description": "Düşünceleri gelip geçen olaylar olarak gör.", "routines": [{ "id": "noting", "title": "Düşünce Notlama", "description": "Düşünceyi fark et, adlandır ve bırak.", "category": "spiritual", "daysOfWeek": [1,2,3,4,5,6,7], "targetMinutes": 8 }] },
+      { "week": 4, "title": "Sakin Ritim", "description": "On dakikalık bütünleşik pratik.", "routines": [{ "id": "calm-10", "title": "10 Dk Zihinsel Temizlik", "description": "Nefes, beden ve düşünce farkındalığını birleştir.", "category": "spiritual", "daysOfWeek": [1,2,3,4,5,6,7], "targetMinutes": 10 }] }
+    ]
+  }
+]
