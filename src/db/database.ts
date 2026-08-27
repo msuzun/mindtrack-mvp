@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import { ActivityDay, Category, DailyCompletionStats, PeriodStats, Task } from '../types';
+import { ActivityDay, Category, CategoryTag, DailyCompletionStats, PeriodStats, PriorityLevel, Task } from '../types';
 import { addDays } from '../utils/date';
 
 const dbPromise = SQLite.openDatabaseAsync('mindtrack.db');
@@ -14,6 +14,8 @@ type TaskRow = {
   sort_order: number;
   completed: number;
   completed_at: string | null;
+  category_tag: CategoryTag | null;
+  priority_level: PriorityLevel;
 };
 
 const templates: Array<{
@@ -118,6 +120,15 @@ export async function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_focus_sessions_task
     ON focus_sessions(task_id, completed_at);
   `);
+
+  const taskColumns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(tasks)');
+  const columnNames = new Set(taskColumns.map((column) => column.name));
+  if (!columnNames.has('category_tag')) {
+    await db.execAsync('ALTER TABLE tasks ADD COLUMN category_tag TEXT');
+  }
+  if (!columnNames.has('priority_level')) {
+    await db.execAsync('ALTER TABLE tasks ADD COLUMN priority_level INTEGER NOT NULL DEFAULT 0');
+  }
 }
 
 export async function saveFocusSession(taskId: number, durationSeconds: number) {
@@ -243,7 +254,23 @@ function mapTask(row: TaskRow): Task {
     sortOrder: row.sort_order,
     completed: row.completed === 1,
     completedAt: row.completed_at,
+    categoryTag: row.category_tag ?? null,
+    priorityLevel: row.priority_level ?? 0,
   };
+}
+
+export async function updateTaskCustomization(
+  id: number,
+  categoryTag: CategoryTag | null,
+  priorityLevel: PriorityLevel
+) {
+  const db = await dbPromise;
+  await db.runAsync(
+    `UPDATE tasks SET category_tag = ?, priority_level = ? WHERE id = ?`,
+    categoryTag,
+    priorityLevel,
+    id
+  );
 }
 
 export async function getTasksForDate(date: string): Promise<Task[]> {

@@ -5,6 +5,8 @@ import { radii, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 import { Task } from '../types';
 import { CompletionSparkle } from './CompletionSparkle';
+import { CategoryPill, PriorityIndicator } from './CategoryPill';
+import { CategoryTag } from '../types';
 
 const categoryLabel = {
   memory: 'HAFIZA',
@@ -12,18 +14,24 @@ const categoryLabel = {
   spiritual: 'ODAK / DUA',
 };
 
-export function TaskCard({ task, onToggle, onFocus }: { task: Task; onToggle: () => void; onFocus?: () => void }) {
+const fallbackTag: Record<Task['category'], CategoryTag> = { memory: 'focus', cognitive: 'work', spiritual: 'personal' };
+
+export function TaskCard({ task, onToggle, onFocus, onCustomize }: {
+  task: Task; onToggle: () => void; onFocus?: () => void; onCustomize?: () => void;
+}) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const checkboxScale = useRef(new Animated.Value(1)).current;
   const strikeProgress = useRef(new Animated.Value(task.completed ? 1 : 0)).current;
   const [sparkleTrigger, setSparkleTrigger] = useState(0);
   const [visualCompleted, setVisualCompleted] = useState(task.completed);
+  const cardOpacity = useRef(new Animated.Value(task.completed ? 0.6 : 1)).current;
 
   useEffect(() => {
     setVisualCompleted(task.completed);
     if (!task.completed) strikeProgress.setValue(0);
-  }, [strikeProgress, task.completed]);
+    Animated.timing(cardOpacity, { toValue: task.completed ? 0.6 : 1, duration: 240, useNativeDriver: true }).start();
+  }, [cardOpacity, strikeProgress, task.completed]);
 
   const handlePress = () => {
     if (!task.completed) {
@@ -46,7 +54,8 @@ export function TaskCard({ task, onToggle, onFocus }: { task: Task; onToggle: ()
   };
 
   return (
-    <View style={[styles.card, visualCompleted && styles.doneCard]}>
+    <Animated.View style={[styles.card, visualCompleted && styles.doneCard, { opacity: cardOpacity }]}>
+      <PriorityIndicator level={task.priorityLevel} />
       <Pressable
         onPress={handlePress}
         accessibilityRole="checkbox"
@@ -62,7 +71,10 @@ export function TaskCard({ task, onToggle, onFocus }: { task: Task; onToggle: ()
           <Text style={styles.check}>{visualCompleted ? '✓' : ''}</Text>
         </Animated.View>
         <View style={styles.content}>
-          <Text style={[styles.category, visualCompleted && styles.categoryDone]}>{categoryLabel[task.category]}</Text>
+          <View style={styles.metaRow}>
+            <CategoryPill tag={task.categoryTag ?? fallbackTag[task.category]} />
+            <Text style={styles.legacyCategory}>{categoryLabel[task.category]}</Text>
+          </View>
           <View style={styles.titleWrap}>
             <Text style={[styles.title, visualCompleted && styles.doneText]}>{task.title}</Text>
             <Animated.View style={[styles.strikeLine, { transform: [{ scaleX: strikeProgress }] }]} />
@@ -73,13 +85,16 @@ export function TaskCard({ task, onToggle, onFocus }: { task: Task; onToggle: ()
           <Text style={styles.minutes}>{task.targetMinutes} dk</Text>
         </View>
       </Pressable>
-      {onFocus && !visualCompleted && (
-        <Pressable onPress={onFocus} style={styles.focusButton} accessibilityRole="button" accessibilityLabel={`${task.title} için odaklanmayı başlat`}>
+      {!visualCompleted && <View style={styles.cardActions}>
+        {onFocus && <Pressable onPress={onFocus} style={styles.focusButton} accessibilityRole="button" accessibilityLabel={`${task.title} için odaklanmayı başlat`}>
           <Text style={styles.focusText}>◎ Odaklanmayı Başlat</Text>
-        </Pressable>
-      )}
+        </Pressable>}
+        {onCustomize && <Pressable onPress={onCustomize} style={styles.editButton} accessibilityRole="button" accessibilityLabel={`${task.title} kartını özelleştir`}>
+          <Text style={styles.editText}>Özelleştir</Text>
+        </Pressable>}
+      </View>}
       <CompletionSparkle trigger={sparkleTrigger} />
-    </View>
+    </Animated.View>
   );
 }
 
@@ -99,21 +114,24 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   checkboxDone: { backgroundColor: colors.success, borderColor: colors.success },
   check: { color: colors.onAccent, fontWeight: '800', fontSize: 16 },
   content: { flex: 1, marginHorizontal: 13 },
-  category: { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: colors.accent, marginBottom: 5 },
-  categoryDone: { color: colors.success },
-  title: { fontSize: 16, fontWeight: '700', lineHeight: 23, color: colors.textPrimary },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 7 },
+  legacyCategory: { fontSize: 9, lineHeight: 13.5, fontWeight: '600', letterSpacing: 0.7, color: colors.textMuted },
+  title: { fontSize: 16, fontWeight: '600', lineHeight: 24, letterSpacing: -0.15, color: colors.textPrimary },
   titleWrap: { alignSelf: 'stretch', position: 'relative' },
   doneText: { color: colors.textMuted },
   strikeLine: {
     position: 'absolute', left: 0, right: 0, top: '52%', height: 2,
     borderRadius: 1, backgroundColor: colors.success, transformOrigin: 'left center',
   },
-  description: { marginTop: 5, lineHeight: 20, color: colors.textMuted, fontSize: 13 },
+  description: { marginTop: 5, lineHeight: 19.5, color: colors.textMuted, fontSize: 13, fontWeight: '400', letterSpacing: 0.05 },
   timeBadge: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: radii.pill, backgroundColor: colors.surfaceRaised },
   minutes: { fontSize: 11, fontWeight: '700', color: colors.textMuted },
+  cardActions: { flexDirection: 'row', alignItems: 'center', marginTop: 14, marginLeft: 41, gap: 8 },
   focusButton: {
-    alignSelf: 'flex-start', marginTop: 14, marginLeft: 41, paddingVertical: 7,
+    paddingVertical: 7,
     paddingHorizontal: 11, borderRadius: radii.pill, backgroundColor: colors.surfaceRaised,
   },
   focusText: { color: colors.accent, fontSize: 11, fontWeight: '700', letterSpacing: 0.2 },
+  editButton: { paddingVertical: 7, paddingHorizontal: 10, borderRadius: radii.pill },
+  editText: { color: colors.textMuted, fontSize: 11, lineHeight: 16.5, fontWeight: '600' },
 });

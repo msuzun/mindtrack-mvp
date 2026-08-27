@@ -4,12 +4,12 @@ import { getReminderSettings, ReminderSettings } from '../db/database';
 import { NotificationService } from '../services/NotificationService';
 import { HapticService } from '../services/HapticService';
 import { radii, spacing, ThemeColors, ThemeMode } from '../theme';
-import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
+import { FontSizeScale, useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
 const twoDigits = (value: number) => String(value).padStart(2, '0');
 
 export function SettingsScreen() {
-  const { colors, mode, setMode } = useTheme();
+  const { colors, mode, setMode, fontSizeScale, setFontSizeScale } = useTheme();
   const styles = useThemedStyles(createStyles);
   const [settings, setSettings] = useState<ReminderSettings | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
@@ -91,6 +91,22 @@ export function SettingsScreen() {
             accessibilityState={{ checked: selected }} style={[styles.segment, selected && styles.segmentSelected]}>
             <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>{label}</Text>
           </Pressable>;
+        })}
+      </View>
+
+      <Text style={styles.sectionTitle}>Yazı Boyutu</Text>
+      <View style={styles.fontScaleRow} accessibilityRole="radiogroup">
+        {([
+          [0.9, 'Küçük', 'Aa'], [1, 'Orta', 'Aa'], [1.15, 'Büyük', 'Aa'],
+        ] as Array<[FontSizeScale, string, string]>).map(([value, label, preview]) => {
+          const selected = fontSizeScale === value;
+          return (
+            <Pressable key={value} onPress={() => void setFontSizeScale(value)} accessibilityRole="radio"
+              accessibilityState={{ checked: selected }} style={[styles.fontScaleCard, selected && styles.fontScaleCardSelected]}>
+              <Text style={[styles.fontPreview, { fontSize: 18 * value }, selected && styles.fontPreviewSelected]}>{preview}</Text>
+              <Text style={[styles.fontScaleLabel, selected && styles.fontScaleLabelSelected]}>{label}</Text>
+            </Pressable>
+          );
         })}
       </View>
 
@@ -188,6 +204,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   segmentSelected: { backgroundColor: colors.accent },
   segmentText: { color: colors.textMuted, fontSize: 13, fontWeight: '700' },
   segmentTextSelected: { color: colors.onAccent },
+  fontScaleRow: { flexDirection: 'row', gap: 9, marginBottom: 24 },
+  fontScaleCard: { flex: 1, minHeight: 74, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  fontScaleCardSelected: { borderColor: colors.accent, backgroundColor: colors.surfaceRaised },
+  fontPreview: { color: colors.textMuted, fontWeight: '600', lineHeight: 24 },
+  fontPreviewSelected: { color: colors.accent },
+  fontScaleLabel: { color: colors.textMuted, fontSize: 11, lineHeight: 16.5, fontWeight: '600', marginTop: 4 },
+  fontScaleLabelSelected: { color: colors.textPrimary },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radii.card, padding: spacing.card },
   interactionCard: { marginBottom: 16 },
   row: { flexDirection: 'row', alignItems: 'center' }, rowText: { flex: 1, paddingRight: 14 },
