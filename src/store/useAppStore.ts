@@ -3,7 +3,7 @@ import { Task } from '../types';
 import { getTasksForDate, setTaskCompleted } from '../db/database';
 import { RoutineSchedulerEngine } from '../services/RoutineSchedulerEngine';
 import { toLocalDateKey } from '../utils/date';
-import { NotificationService } from '../services/NotificationService';
+import { SmartNotificationScheduler } from '../services/SmartNotificationScheduler';
 
 type Tab = 'today' | 'goals' | 'progress' | 'settings' | 'about';
 
@@ -41,6 +41,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleTask: async (task) => {
     await setTaskCompleted(task.id, !task.completed);
     await get().loadDay(task.date);
-    await NotificationService.refreshSchedule();
+    await SmartNotificationScheduler.cancelTodayIfComplete();
   },
 }));

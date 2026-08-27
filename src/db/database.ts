@@ -3,6 +3,7 @@ import {
   ActivityDay, Category, CategoryTag, DailyCompletionStats, Goal, GoalOverview,
   GoalStatus, PeriodStats, PriorityLevel, Routine, RoutineFrequency, Task,
   TrainingSession,
+  NotificationSettings, NotificationTone, NotificationCategory,
 } from '../types';
 
 const dbPromise = SQLite.openDatabaseAsync('mindtrack.db');
@@ -183,13 +184,27 @@ async function initializeDatabase() {
     );
     CREATE INDEX IF NOT EXISTS idx_smart_suggestions_status_created
     ON smart_suggestions(status, created_at);
+
+    CREATE TABLE IF NOT EXISTS notification_settings (
+      id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
+      enabled INTEGER NOT NULL DEFAULT 0 CHECK (enabled IN (0, 1)),
+      hour INTEGER NOT NULL DEFAULT 9 CHECK (hour BETWEEN 0 AND 23),
+      minute INTEGER NOT NULL DEFAULT 0 CHECK (minute BETWEEN 0 AND 59),
+      tone TEXT NOT NULL DEFAULT 'balanced' CHECK (tone IN ('gentle','balanced','energetic')),
+      quiet_hours_start TEXT NOT NULL DEFAULT '22:00', quiet_hours_end TEXT NOT NULL DEFAULT '08:30',
+      auto_reduce_frequency INTEGER NOT NULL DEFAULT 1 CHECK (auto_reduce_frequency IN (0, 1)),
+      ignored_count INTEGER NOT NULL DEFAULT 0 CHECK (ignored_count >= 0),
+      enabled_categories TEXT NOT NULL DEFAULT '["memory","cognitive","general"]',
+      last_app_opened_at TEXT
+    );
+    INSERT OR IGNORE INTO notification_settings (id) VALUES (1);
   `);
 
   await ensureColumn(db, 'routines', 'default_item_count', 'INTEGER NOT NULL DEFAULT 30');
   await ensureColumn(db, 'routines', 'estimated_duration_minutes', 'INTEGER NOT NULL DEFAULT 20');
 
   await db.runAsync(
-    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.4.0')
+    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.5.0')
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`
   );
 
@@ -245,6 +260,51 @@ export async function saveReminderSettings(settings: ReminderSettings) {
   await setAppSetting('daily_reminder', JSON.stringify(settings));
 }
 
+const ALL_NOTIFICATION_CATEGORIES: NotificationCategory[] = ['memory', 'cognitive', 'general'];
+
+export async function getNotificationSettings(): Promise<NotificationSettings> {
+  await initDatabase();
+  const db = await dbPromise;
+  const row = await db.getFirstAsync<any>('SELECT * FROM notification_settings WHERE id = 1');
+  let categories = ALL_NOTIFICATION_CATEGORIES;
+  try {
+    const parsed = JSON.parse(row?.enabled_categories ?? '[]');
+    if (Array.isArray(parsed)) categories = parsed.filter((item): item is NotificationCategory => ALL_NOTIFICATION_CATEGORIES.includes(item));
+  } catch { categories = ALL_NOTIFICATION_CATEGORIES; }
+  const legacy = await getReminderSettings();
+  return {
+    enabled: row?.enabled === 1 || (row?.enabled === 0 && legacy.enabled),
+    hour: row?.hour ?? legacy.hour, minute: row?.minute ?? legacy.minute,
+    tone: (['gentle', 'balanced', 'energetic'].includes(row?.tone) ? row.tone : 'balanced') as NotificationTone,
+    quietHoursStart: row?.quiet_hours_start ?? '22:00', quietHoursEnd: row?.quiet_hours_end ?? '08:30',
+    autoReduceFrequency: row?.auto_reduce_frequency !== 0, ignoredCount: row?.ignored_count ?? 0,
+    enabledCategories: categories, lastAppOpenedAt: row?.last_app_opened_at ?? null,
+  };
+}
+
+export async function saveNotificationSettings(settings: NotificationSettings) {
+  await initDatabase();
+  const db = await dbPromise;
+  await db.runAsync(
+    `UPDATE notification_settings SET enabled=?, hour=?, minute=?, tone=?, quiet_hours_start=?, quiet_hours_end=?,
+     auto_reduce_frequency=?, ignored_count=?, enabled_categories=?, last_app_opened_at=? WHERE id=1`,
+    settings.enabled ? 1 : 0, settings.hour, settings.minute, settings.tone,
+    settings.quietHoursStart, settings.quietHoursEnd, settings.autoReduceFrequency ? 1 : 0,
+    Math.max(0, settings.ignoredCount), JSON.stringify(settings.enabledCategories), settings.lastAppOpenedAt
+  );
+  await saveReminderSettings({ enabled: settings.enabled, hour: settings.hour, minute: settings.minute });
+}
+
+export async function getNotificationDayContext(date: string) {
+  await initDatabase();
+  const db = await dbPromise;
+  const tasks = await db.getAllAsync<any>(
+    `SELECT id, title, category, target_minutes, priority_level, is_completed FROM task_instances WHERE scheduled_date = ?`, date
+  );
+  return tasks.map((row) => ({ id: row.id as string, title: row.title as string, category: row.category as Category,
+    targetMinutes: Number(row.target_minutes ?? 0), priorityLevel: Number(row.priority_level ?? 0), completed: row.is_completed === 1 }));
+}
+
 export async function getAppSetting(key: string): Promise<string | null> {
   await initDatabase();
   const db = await dbPromise;
@@ -297,6 +357,24 @@ export async function getIncompleteTaskCount(date: string) {
     'SELECT COUNT(*) AS count FROM task_instances WHERE scheduled_date = ? AND is_completed = 0', date
   );
   return row?.count ?? 0;
+}
+
+export async function getBestNextTask(date: string): Promise<Task | null> {
+  await initDatabase();
+  const db = await dbPromise;
+  const hour = new Date().getHours();
+  const row = await db.getFirstAsync<TaskRow>(
+    `SELECT ti.*, g.title AS goal_title
+     FROM task_instances ti LEFT JOIN goals g ON g.id = ti.goal_id
+     WHERE ti.scheduled_date = ? AND ti.is_completed = 0
+     ORDER BY ti.priority_level DESC,
+       (SELECT COUNT(*) FROM task_instances history
+        WHERE history.category = ti.category AND history.completed_at IS NOT NULL
+          AND ABS(CAST(strftime('%H', history.completed_at, 'localtime') AS INTEGER) - ?) <= 2) DESC,
+       CASE WHEN ti.target_minutes BETWEEN 10 AND 25 THEN 0 ELSE 1 END,
+       ti.sort_order ASC LIMIT 1`, date, hour
+  );
+  return row ? mapTask(row) : null;
 }
 
 export async function setTaskCompleted(id: string, completed: boolean) {

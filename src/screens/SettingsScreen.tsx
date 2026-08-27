@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { IconSelector } from '../components/IconSelector';
-import { getReminderSettings, ReminderSettings } from '../db/database';
+import { getNotificationSettings, saveNotificationSettings } from '../db/database';
+import { NotificationCategory, NotificationSettings, NotificationTone } from '../types';
+import { SmartNotificationScheduler } from '../services/SmartNotificationScheduler';
 import { NotificationService } from '../services/NotificationService';
 import { HapticService } from '../services/HapticService';
 import { AppIconId, AppIconService } from '../services/AppIconService';
@@ -13,7 +15,7 @@ const twoDigits = (value: number) => String(value).padStart(2, '0');
 export function SettingsScreen() {
   const { colors, mode, setMode, fontSizeScale, setFontSizeScale } = useTheme();
   const styles = useThemedStyles(createStyles);
-  const [settings, setSettings] = useState<ReminderSettings | null>(null);
+  const [settings, setSettings] = useState<NotificationSettings | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [canAskAgain, setCanAskAgain] = useState(true);
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -26,7 +28,7 @@ export function SettingsScreen() {
 
   useEffect(() => {
     void (async () => {
-      const saved = await getReminderSettings();
+      const saved = await getNotificationSettings();
       const permission = await NotificationService.getPermissionStatus();
       const savedHaptics = await HapticService.getEnabled();
       const savedIcon = await AppIconService.getSelected();
@@ -92,6 +94,22 @@ export function SettingsScreen() {
     }
   }
 
+  async function updateSmartSettings(patch: Partial<NotificationSettings>) {
+    if (!settings) return;
+    const next = { ...settings, ...patch };
+    setSettings(next);
+    await saveNotificationSettings(next);
+    await SmartNotificationScheduler.rescheduleNext();
+  }
+
+  function toggleCategory(category: NotificationCategory) {
+    if (!settings) return;
+    const enabledCategories = settings.enabledCategories.includes(category)
+      ? settings.enabledCategories.filter((item) => item !== category)
+      : [...settings.enabledCategories, category];
+    void updateSmartSettings({ enabledCategories });
+  }
+
   if (!settings) return <ActivityIndicator style={styles.loader} color={colors.accent} />;
 
   return (
@@ -153,6 +171,32 @@ export function SettingsScreen() {
           </View>
           <Text style={styles.time}>{twoDigits(settings.hour)}:{twoDigits(settings.minute)}</Text>
         </Pressable>
+        <View style={styles.divider} />
+        <Text style={styles.optionTitle}>Bildirim tonu</Text>
+        <View style={styles.choiceRow}>
+          {([['gentle', 'Nazik'], ['balanced', 'Normal'], ['energetic', 'Motive Edici']] as Array<[NotificationTone, string]>).map(([tone, label]) => (
+            <Pressable key={tone} onPress={() => void updateSmartSettings({ tone })} style={[styles.choice, settings.tone === tone && styles.choiceActive]}>
+              <Text style={[styles.choiceText, settings.tone === tone && styles.choiceTextActive]}>{label}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.row}><View style={styles.rowText}><Text style={styles.label}>Sessiz saatler</Text><Text style={styles.help}>{settings.quietHoursStart} – {settings.quietHoursEnd} arasında planlama yapılmaz.</Text></View>
+          <Pressable onPress={() => void updateSmartSettings(settings.quietHoursStart === '22:00' ? { quietHoursStart: '23:00', quietHoursEnd: '08:00' } : { quietHoursStart: '22:00', quietHoursEnd: '08:30' })} style={styles.smallButton}><Text style={styles.smallButtonText}>Değiştir</Text></Pressable>
+        </View>
+        <View style={styles.divider} />
+        <Text style={styles.optionTitle}>Kategoriler</Text>
+        <View style={styles.choiceRow}>
+          {([['memory', 'Hafıza'], ['cognitive', 'Mantık'], ['general', 'Genel']] as Array<[NotificationCategory, string]>).map(([category, label]) => (
+            <Pressable key={category} onPress={() => toggleCategory(category)} style={[styles.choice, settings.enabledCategories.includes(category) && styles.choiceActive]}>
+              <Text style={[styles.choiceText, settings.enabledCategories.includes(category) && styles.choiceTextActive]}>{label}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.row}><View style={styles.rowText}><Text style={styles.label}>Akıllı sıklık azaltma</Text><Text style={styles.help}>Üç günlük pasiflikte bildirimleri iki günde bire indirir.</Text></View>
+          <Switch value={settings.autoReduceFrequency} onValueChange={(autoReduceFrequency) => void updateSmartSettings({ autoReduceFrequency })} trackColor={{ false: colors.border, true: colors.accent }} thumbColor={colors.textPrimary} />
+        </View>
       </View>
 
       <Text style={styles.sectionTitle}>Etkileşim</Text>
@@ -240,6 +284,10 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 18 },
   timeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   time: { color: colors.accent, fontSize: 24, fontWeight: '700', marginLeft: 12 }, pressed: { opacity: 0.7 },
+  optionTitle: { color: colors.textPrimary, fontSize: 13, fontWeight: '700', marginBottom: 10 },
+  choiceRow: { flexDirection: 'row', gap: 7 }, choice: { flex: 1, minHeight: 38, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5, borderRadius: 10, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background },
+  choiceActive: { borderColor: colors.accent, backgroundColor: colors.surfaceRaised }, choiceText: { color: colors.textMuted, fontSize: 10, fontWeight: '700', textAlign: 'center' }, choiceTextActive: { color: colors.accent },
+  smallButton: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 9, borderWidth: 1, borderColor: colors.border }, smallButtonText: { color: colors.accent, fontSize: 11, fontWeight: '700' },
   notice: { marginTop: 16, padding: 16, borderRadius: radii.card, backgroundColor: colors.surfaceRaised, borderWidth: 1, borderColor: colors.border },
   noticeTitle: { color: colors.textPrimary, fontSize: 14, fontWeight: '700' }, noticeText: { color: colors.textMuted, fontSize: 13, lineHeight: 19, marginTop: 5 },
   settingsButton: { alignSelf: 'flex-start', marginTop: 12, paddingVertical: 9, paddingHorizontal: 12, backgroundColor: colors.accent, borderRadius: 10 },

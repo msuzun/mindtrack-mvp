@@ -14,6 +14,7 @@ import { useAppStore } from './src/store/useAppStore';
 import { ThemeColors } from './src/theme';
 import { ThemeProvider, useTheme, useThemedStyles } from './src/theme/ThemeProvider';
 import { toLocalDateKey } from './src/utils/date';
+import { SmartNotificationScheduler } from './src/services/SmartNotificationScheduler';
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -41,11 +42,12 @@ function AppContent() {
 
   useEffect(() => {
     if (!ready) return;
-    void NotificationService.refreshSchedule();
+    void SmartNotificationScheduler.recordAppOpened().then(() => NotificationService.refreshSchedule());
     void NotificationService.handleInitialResponse(() => setTab('today'));
     const responseSubscription = NotificationService.addResponseListener(() => setTab('today'));
     const appStateSubscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void NotificationService.refreshSchedule();
+      if (state === 'active') void SmartNotificationScheduler.recordAppOpened().then(() => NotificationService.refreshSchedule());
+      if (state === 'background' || state === 'inactive') void NotificationService.refreshSchedule();
     });
     return () => {
       responseSubscription.remove();
