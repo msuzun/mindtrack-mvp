@@ -7,7 +7,7 @@ export type Tab = 'today' | 'goals' | 'progress' | 'settings' | 'about';
 const tabs: Array<{ key: Tab; label: string; icon: string }> = [
   { key: 'today', label: 'Bugün', icon: '✓' },
   { key: 'goals', label: 'Hedefler', icon: '◎' },
-  { key: 'progress', label: 'İlerleme', icon: '↗' },
+  { key: 'progress', label: 'İçgörüler', icon: '↗' },
   { key: 'settings', label: 'Ayarlar', icon: '⚙' },
   { key: 'about', label: 'Hakkında', icon: 'i' },
 ];

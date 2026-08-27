@@ -6,7 +6,7 @@ import { BottomTabs } from './src/components/BottomTabs';
 import { initDatabase } from './src/db/database';
 import { AboutScreen } from './src/screens/AboutScreen';
 import { GoalsScreen } from './src/screens/GoalsScreen';
-import { ProgressScreen } from './src/screens/ProgressScreen';
+import { PerformanceInsightsScreen } from './src/screens/PerformanceInsightsScreen';
 import { TodayScreen } from './src/screens/TodayScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { NotificationService } from './src/services/NotificationService';
@@ -103,7 +103,7 @@ function AppContent() {
         <View style={styles.body}>
           {tab === 'today' && <TodayScreen />}
           {tab === 'goals' && <GoalsScreen />}
-          {tab === 'progress' && <ProgressScreen />}
+          {tab === 'progress' && <PerformanceInsightsScreen />}
           {tab === 'settings' && <SettingsScreen />}
           {tab === 'about' && <AboutScreen />}
         </View>
