@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import { EmptyStateView } from '../components/EmptyStateView';
 import { TaskCard } from '../components/TaskCard';
 import { ZenFocusModal } from '../components/ZenFocusModal';
+import { TaskCustomizationModal } from '../components/TaskCustomizationModal';
 import { useAppStore } from '../store/useAppStore';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
@@ -11,8 +12,9 @@ import { Task } from '../types';
 export function TodayScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
-  const { tasks, loading, toggleTask, selectedDate, setTab } = useAppStore();
+  const { tasks, loading, toggleTask, selectedDate, setTab, loadDay } = useAppStore();
   const [focusedTask, setFocusedTask] = useState<Task | null>(null);
+  const [customizingTask, setCustomizingTask] = useState<Task | null>(null);
 
   const completed = tasks.filter((x) => x.completed).length;
   const total = tasks.length;
@@ -68,6 +70,7 @@ export function TodayScreen() {
               task={task}
               onToggle={() => void toggleTask(task)}
               onFocus={() => setFocusedTask(task)}
+              onCustomize={() => setCustomizingTask(task)}
             />
           ))}
         </>
@@ -79,6 +82,13 @@ export function TodayScreen() {
           onComplete={async () => {
             if (!focusedTask.completed) await toggleTask(focusedTask);
           }}
+        />
+      )}
+      {customizingTask && (
+        <TaskCustomizationModal
+          task={customizingTask}
+          onClose={() => setCustomizingTask(null)}
+          onSaved={() => loadDay(selectedDate)}
         />
       )}
     </ScrollView>

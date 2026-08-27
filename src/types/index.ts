@@ -1,4 +1,6 @@
 export type Category = 'memory' | 'cognitive' | 'spiritual';
+export type CategoryTag = 'focus' | 'personal' | 'work' | 'routine';
+export type PriorityLevel = 0 | 1 | 2;
 
 export type Task = {
   id: number;
@@ -10,6 +12,8 @@ export type Task = {
   sortOrder: number;
   completed: boolean;
   completedAt: string | null;
+  categoryTag: CategoryTag | null;
+  priorityLevel: PriorityLevel;
 };
 
 export type DaySummary = {

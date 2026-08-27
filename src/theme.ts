@@ -8,6 +8,11 @@ export const darkColors = {
   heatmapLow: '#6ee7b7', heatmapMedium: '#34d399',
   illustrationLine: '#94a3b8', illustrationGlowPrimary: 'rgba(56, 189, 248, 0.12)',
   illustrationGlowSecondary: 'rgba(16, 185, 129, 0.10)', illustrationFill: 'rgba(148, 163, 184, 0.08)',
+  tagFocusBg: 'rgba(168, 85, 247, 0.15)', tagFocusText: '#c084fc',
+  tagPersonalBg: 'rgba(16, 185, 129, 0.15)', tagPersonalText: '#34d399',
+  tagWorkBg: 'rgba(56, 189, 248, 0.15)', tagWorkText: '#38bdf8',
+  tagRoutineBg: 'rgba(251, 146, 60, 0.15)', tagRoutineText: '#fb923c',
+  priorityImportant: '#f59e0b', priorityUrgent: '#fb7185',
 } as const;
 
 export const lightColors = {
@@ -20,6 +25,11 @@ export const lightColors = {
   heatmapLow: '#a7f3d0', heatmapMedium: '#34d399',
   illustrationLine: '#64748b', illustrationGlowPrimary: 'rgba(2, 132, 199, 0.08)',
   illustrationGlowSecondary: 'rgba(5, 150, 105, 0.08)', illustrationFill: 'rgba(100, 116, 139, 0.06)',
+  tagFocusBg: 'rgba(147, 51, 234, 0.10)', tagFocusText: '#7e22ce',
+  tagPersonalBg: 'rgba(5, 150, 105, 0.10)', tagPersonalText: '#047857',
+  tagWorkBg: 'rgba(2, 132, 199, 0.10)', tagWorkText: '#0369a1',
+  tagRoutineBg: 'rgba(217, 119, 6, 0.10)', tagRoutineText: '#b45309',
+  priorityImportant: '#d97706', priorityUrgent: '#e11d48',
 } as const;
 
 export type ThemeMode = 'system' | 'dark' | 'light';
