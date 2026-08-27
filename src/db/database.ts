@@ -101,7 +101,66 @@ export async function initDatabase() {
 
     CREATE INDEX IF NOT EXISTS idx_tasks_date
     ON tasks(date);
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY NOT NULL,
+      value TEXT NOT NULL
+    );
   `);
+}
+
+export type ReminderSettings = {
+  enabled: boolean;
+  hour: number;
+  minute: number;
+};
+
+const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
+  enabled: false,
+  hour: 9,
+  minute: 0,
+};
+
+export async function getReminderSettings(): Promise<ReminderSettings> {
+  const db = await dbPromise;
+  const row = await db.getFirstAsync<{ value: string }>(
+    `SELECT value FROM app_settings WHERE key = 'daily_reminder'`
+  );
+
+  if (!row) return DEFAULT_REMINDER_SETTINGS;
+
+  try {
+    const parsed = JSON.parse(row.value) as Partial<ReminderSettings>;
+    return {
+      enabled: parsed.enabled === true,
+      hour: Number.isInteger(parsed.hour) && parsed.hour! >= 0 && parsed.hour! <= 23
+        ? parsed.hour!
+        : DEFAULT_REMINDER_SETTINGS.hour,
+      minute: Number.isInteger(parsed.minute) && parsed.minute! >= 0 && parsed.minute! <= 59
+        ? parsed.minute!
+        : DEFAULT_REMINDER_SETTINGS.minute,
+    };
+  } catch {
+    return DEFAULT_REMINDER_SETTINGS;
+  }
+}
+
+export async function saveReminderSettings(settings: ReminderSettings) {
+  const db = await dbPromise;
+  await db.runAsync(
+    `INSERT INTO app_settings (key, value) VALUES ('daily_reminder', ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    JSON.stringify(settings)
+  );
+}
+
+export async function getIncompleteTaskCount(date: string): Promise<number> {
+  const db = await dbPromise;
+  const row = await db.getFirstAsync<{ count: number }>(
+    `SELECT COUNT(*) AS count FROM tasks WHERE date = ? AND completed = 0`,
+    date
+  );
+  return row?.count ?? 0;
 }
 
 export async function ensureTasksForDate(date: string) {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabs } from './src/components/BottomTabs';
@@ -8,6 +8,8 @@ import { AboutScreen } from './src/screens/AboutScreen';
 import { PlanScreen } from './src/screens/PlanScreen';
 import { ProgressScreen } from './src/screens/ProgressScreen';
 import { TodayScreen } from './src/screens/TodayScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
+import { NotificationService } from './src/services/NotificationService';
 import { useAppStore } from './src/store/useAppStore';
 import { colors } from './src/theme';
 import { toLocalDateKey } from './src/utils/date';
@@ -28,6 +30,20 @@ export default function App() {
       }
     })();
   }, [loadDay]);
+
+  useEffect(() => {
+    if (!ready) return;
+    void NotificationService.refreshSchedule();
+    void NotificationService.handleInitialResponse(() => setTab('today'));
+    const responseSubscription = NotificationService.addResponseListener(() => setTab('today'));
+    const appStateSubscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void NotificationService.refreshSchedule();
+    });
+    return () => {
+      responseSubscription.remove();
+      appStateSubscription.remove();
+    };
+  }, [ready, setTab]);
 
   if (error) {
     return (
@@ -62,6 +78,7 @@ export default function App() {
           {tab === 'today' && <TodayScreen />}
           {tab === 'plan' && <PlanScreen />}
           {tab === 'progress' && <ProgressScreen />}
+          {tab === 'settings' && <SettingsScreen />}
           {tab === 'about' && <AboutScreen />}
         </View>
         <BottomTabs active={tab} onChange={setTab} />

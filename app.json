@@ -2,14 +2,18 @@
   "expo": {
     "name": "MindTrack",
     "slug": "mindtrack",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "scheme": "mindtrack",
     "icon": "./assets/icon.png",
     "android": {
       "package": "com.sevkiuzun.mindtrack",
-      "versionCode": 1,
+      "versionCode": 12,
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#f7f8fa"
@@ -17,7 +21,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.sevkiuzun.mindtrack",
-      "buildNumber": "1",
+      "buildNumber": "12",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -26,6 +30,14 @@
     "plugins": [
       "expo-sqlite",
       "expo-status-bar",
+      [
+        "expo-notifications",
+        {
+          "color": "#38bdf8",
+          "defaultChannel": "daily-reminders",
+          "enableBackgroundRemoteNotifications": false
+        }
+      ],
       [
         "expo-splash-screen",
         {
