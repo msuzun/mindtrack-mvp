@@ -15,6 +15,7 @@ import { ThemeColors } from './src/theme';
 import { ThemeProvider, useTheme, useThemedStyles } from './src/theme/ThemeProvider';
 import { toLocalDateKey } from './src/utils/date';
 import { SmartNotificationScheduler } from './src/services/SmartNotificationScheduler';
+import { PersonalRecordCelebration } from './src/components/PersonalRecordCelebration';
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -110,6 +111,7 @@ function AppContent() {
           {tab === 'about' && <AboutScreen />}
         </View>
         <BottomTabs active={tab} onChange={setTab} />
+        <PersonalRecordCelebration />
         {splashTransitionVisible && (
           <View style={styles.splashOverlay} pointerEvents="none">
             <View style={styles.splashGlow} />

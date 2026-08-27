@@ -6,6 +6,8 @@ import { calculateProgressInsights } from '../utils/calculateProgressInsights';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useThemedStyles } from '../theme/ThemeProvider';
 import { ProgressScreen } from './ProgressScreen';
+import { PersonalRecordsGrid } from '../components/PersonalRecordsGrid';
+import { MonthlyReviewModal } from '../components/MonthlyReviewModal';
 
 type DetailKind = 'cognitive' | 'capacity' | 'areas';
 type DashboardData = { cognitive: CognitiveAccuracyStats; capacity: CapacityFocusStats; areas: StrengthWeaknessStats };
@@ -74,6 +76,7 @@ export function PerformanceInsightsScreen() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [detail, setDetail] = useState<DetailKind | null>(null);
   const [disciplineVisible, setDisciplineVisible] = useState(false);
+  const [reviewVisible, setReviewVisible] = useState(false);
   const load = useCallback(async () => setData(await loadDashboard('weekly')), []);
   useEffect(() => { void load(); }, [load]);
   const insight = data ? calculateProgressInsights(data.cognitive, data.areas.strength, data.areas.opportunity) : null;
@@ -84,19 +87,22 @@ export function PerformanceInsightsScreen() {
       <Pressable onPress={() => setDisciplineVisible(true)} style={styles.disciplineLink} accessibilityRole="button">
         <View><Text style={styles.disciplineLinkLabel}>GÖREV DİSİPLİNİ</Text><Text style={styles.disciplineLinkText}>Tamamlama grafikleri ve aktivite ritmi</Text></View><Text style={styles.disciplineArrow}>→</Text>
       </Pressable>
+      <Pressable onPress={() => setReviewVisible(true)} style={styles.reviewLink} accessibilityRole="button"><View><Text style={styles.reviewLabel}>30 / 90 GÜNLÜK DEĞERLENDİRME</Text><Text style={styles.reviewText}>Gelişim karşılaştırması ve kısa refleksiyon</Text></View><Text style={styles.disciplineArrow}>→</Text></Pressable>
+      <PersonalRecordsGrid />
       {!data || !insight ? <><InsightCardSkeleton /><InsightCardSkeleton /><InsightCardSkeleton /></> : <>
         <CognitiveScoreCard data={data.cognitive} insight={insight} onDetail={setDetail} />
         <CapacityFocusCard data={data.capacity} onDetail={setDetail} />
         <AreaAnalysisCard data={data.areas} insight={insight} onDetail={setDetail} />
       </>}
       <Text style={styles.privacy}>İçgörüler yalnızca cihazındaki eğitim verilerinden hesaplanır.</Text>
-    </ScrollView><DetailModal kind={detail} onClose={() => setDetail(null)} /><DisciplineModal visible={disciplineVisible} onClose={() => setDisciplineVisible(false)} />
+    </ScrollView><DetailModal kind={detail} onClose={() => setDetail(null)} /><DisciplineModal visible={disciplineVisible} onClose={() => setDisciplineVisible(false)} /><MonthlyReviewModal visible={reviewVisible} onClose={() => setReviewVisible(false)} />
   </>;
 }
 
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
   content: { paddingHorizontal: spacing.screen, paddingTop: 22, paddingBottom: 38 }, pageEyebrow: { color: colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1.3 }, pageTitle: { color: colors.textPrimary, fontSize: 27, lineHeight: 35, fontWeight: '700', marginTop: 7 }, pageSubtitle: { color: colors.textMuted, fontSize: 13, lineHeight: 20, marginTop: 6, marginBottom: 12 }, privacy: { color: colors.textMuted, fontSize: 10, textAlign: 'center', marginTop: 4 },
   disciplineLink: { minHeight: 58, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, marginBottom: 16 }, disciplineLinkLabel: { color: colors.success, fontSize: 8, fontWeight: '800', letterSpacing: 1 }, disciplineLinkText: { color: colors.textPrimary, fontSize: 12, fontWeight: '700', marginTop: 3 }, disciplineArrow: { color: colors.accent, fontSize: 21 },
+  reviewLink: { minHeight: 58, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: colors.warning, backgroundColor: colors.surface, marginBottom: 14 }, reviewLabel: { color: colors.warning, fontSize: 8, fontWeight: '800', letterSpacing: 1 }, reviewText: { color: colors.textPrimary, fontSize: 12, fontWeight: '700', marginTop: 3 },
   disciplineScreen: { flex: 1, backgroundColor: colors.background }, disciplineHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 4 }, disciplineTitle: { color: colors.textPrimary, fontSize: 23, fontWeight: '700', marginTop: 3 }, disciplineBody: { flex: 1 },
   modalScreen: { flex: 1, backgroundColor: colors.background, paddingTop: 18 }, modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }, modalEyebrow: { color: colors.accent, fontSize: 9, fontWeight: '800', letterSpacing: 1.1 }, modalTitle: { color: colors.textPrimary, fontSize: 23, fontWeight: '700', marginTop: 4 }, close: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface }, closeText: { color: colors.textMuted, fontSize: 25 },
   segment: { flexDirection: 'row', margin: 20, padding: 4, borderRadius: radii.card, backgroundColor: colors.surface }, segmentItem: { flex: 1, minHeight: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 12 }, segmentActive: { backgroundColor: colors.surfaceRaised }, segmentText: { color: colors.textMuted, fontSize: 12, fontWeight: '700' }, segmentTextActive: { color: colors.accent }, detailContent: { paddingHorizontal: 20, paddingBottom: 32 },
