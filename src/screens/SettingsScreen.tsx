@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { IconSelector } from '../components/IconSelector';
 import { getReminderSettings, ReminderSettings } from '../db/database';
 import { NotificationService } from '../services/NotificationService';
 import { HapticService } from '../services/HapticService';
+import { AppIconId, AppIconService } from '../services/AppIconService';
 import { radii, spacing, ThemeColors, ThemeMode } from '../theme';
 import { FontSizeScale, useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
@@ -19,18 +21,35 @@ export function SettingsScreen() {
   const [draftMinute, setDraftMinute] = useState(0);
   const [saving, setSaving] = useState(false);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const [selectedIcon, setSelectedIcon] = useState<AppIconId>('zen-blue');
+  const [changingIcon, setChangingIcon] = useState(false);
 
   useEffect(() => {
     void (async () => {
       const saved = await getReminderSettings();
       const permission = await NotificationService.getPermissionStatus();
       const savedHaptics = await HapticService.getEnabled();
+      const savedIcon = await AppIconService.getSelected();
       setSettings(saved);
       setPermissionDenied(saved.enabled && !permission.granted);
       setCanAskAgain(permission.canAskAgain);
       setHapticsEnabled(savedHaptics);
+      setSelectedIcon(savedIcon);
     })();
   }, []);
+
+  async function changeIcon(iconId: AppIconId) {
+    if (changingIcon || iconId === selectedIcon) return;
+    setChangingIcon(true);
+    try {
+      await AppIconService.setIcon(iconId);
+      setSelectedIcon(iconId);
+    } catch (error) {
+      Alert.alert('İkon değiştirilemedi', error instanceof Error ? error.message : 'Native ikon modülü kullanılamıyor.');
+    } finally {
+      setChangingIcon(false);
+    }
+  }
 
   async function toggleReminder(enabled: boolean) {
     if (!settings || saving) return;
@@ -109,6 +128,9 @@ export function SettingsScreen() {
           );
         })}
       </View>
+
+      <Text style={styles.sectionTitle}>Uygulama İkonu</Text>
+      <IconSelector selected={selectedIcon} disabled={changingIcon} onSelect={(iconId) => void changeIcon(iconId)} />
 
       <Text style={styles.sectionTitle}>Bildirimler</Text>
 

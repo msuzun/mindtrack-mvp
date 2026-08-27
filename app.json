@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "mindtrack",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icons/icon-zen-blue.png",
     "android": {
       "package": "com.sevkiuzun.mindtrack",
       "versionCode": 14,
@@ -15,19 +15,35 @@
         "android.permission.SCHEDULE_EXACT_ALARM"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#f7f8fa"
+        "foregroundImage": "./assets/app-icons/icon-zen-foreground.png",
+        "backgroundColor": "#0f172a"
       }
     },
     "ios": {
       "bundleIdentifier": "com.sevkiuzun.mindtrack",
       "buildNumber": "14",
       "supportsTablet": true,
+      "icon": "./assets/app-icons/icon-zen-blue.png",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleIcons": {
+          "CFBundleAlternateIcons": {
+            "AppIcon-Midnight": { "CFBundleIconFiles": ["AppIcon-Midnight"], "UIPrerenderedIcon": true },
+            "AppIcon-PureLight": { "CFBundleIconFiles": ["AppIcon-PureLight"], "UIPrerenderedIcon": true },
+            "AppIcon-SolarSunset": { "CFBundleIconFiles": ["AppIcon-SolarSunset"], "UIPrerenderedIcon": true }
+          }
+        },
+        "CFBundleIcons~ipad": {
+          "CFBundleAlternateIcons": {
+            "AppIcon-Midnight": { "CFBundleIconFiles": ["AppIcon-Midnight"], "UIPrerenderedIcon": true },
+            "AppIcon-PureLight": { "CFBundleIconFiles": ["AppIcon-PureLight"], "UIPrerenderedIcon": true },
+            "AppIcon-SolarSunset": { "CFBundleIconFiles": ["AppIcon-SolarSunset"], "UIPrerenderedIcon": true }
+          }
+        }
       }
     },
     "plugins": [
+      "./plugins/withAlternateAppIcons",
       "expo-sqlite",
       "expo-status-bar",
       [
@@ -41,9 +57,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#f7f8fa",
+          "backgroundColor": "#f8fafc",
+          "dark": {
+            "image": "./assets/app-icons/icon-zen-foreground.png",
+            "backgroundColor": "#0f172a"
+          },
+          "image": "./assets/app-icons/icon-zen-foreground.png",
           "imageWidth": 200
         }
       ]
