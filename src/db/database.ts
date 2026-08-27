@@ -106,7 +106,30 @@ export async function initDatabase() {
       key TEXT PRIMARY KEY NOT NULL,
       value TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS focus_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id INTEGER NOT NULL,
+      duration_minutes INTEGER NOT NULL,
+      completed_at TEXT NOT NULL,
+      FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_focus_sessions_task
+    ON focus_sessions(task_id, completed_at);
   `);
+}
+
+export async function saveFocusSession(taskId: number, durationSeconds: number) {
+  const db = await dbPromise;
+  const durationMinutes = Math.max(1, Math.round(durationSeconds / 60));
+  await db.runAsync(
+    `INSERT INTO focus_sessions (task_id, duration_minutes, completed_at)
+     VALUES (?, ?, ?)`,
+    taskId,
+    durationMinutes,
+    new Date().toISOString()
+  );
 }
 
 export type ReminderSettings = {

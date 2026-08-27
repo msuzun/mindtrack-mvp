@@ -12,7 +12,7 @@ const categoryLabel = {
   spiritual: 'ODAK / DUA',
 };
 
-export function TaskCard({ task, onToggle }: { task: Task; onToggle: () => void }) {
+export function TaskCard({ task, onToggle, onFocus }: { task: Task; onToggle: () => void; onFocus?: () => void }) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const checkboxScale = useRef(new Animated.Value(1)).current;
@@ -46,14 +46,14 @@ export function TaskCard({ task, onToggle }: { task: Task; onToggle: () => void 
   };
 
   return (
-    <Pressable
-      onPress={handlePress}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: task.completed }}
-      accessibilityLabel={task.title + ', ' + task.targetMinutes + ' dakika'}
-      style={({ pressed }) => [styles.card, visualCompleted && styles.doneCard, pressed && styles.pressed]}
-    >
-      <View style={styles.row}>
+    <View style={[styles.card, visualCompleted && styles.doneCard]}>
+      <Pressable
+        onPress={handlePress}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: task.completed }}
+        accessibilityLabel={task.title + ', ' + task.targetMinutes + ' dakika'}
+        style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      >
         <Animated.View style={[
           styles.checkbox,
           visualCompleted && styles.checkboxDone,
@@ -72,9 +72,14 @@ export function TaskCard({ task, onToggle }: { task: Task; onToggle: () => void 
         <View style={styles.timeBadge}>
           <Text style={styles.minutes}>{task.targetMinutes} dk</Text>
         </View>
-      </View>
+      </Pressable>
+      {onFocus && !visualCompleted && (
+        <Pressable onPress={onFocus} style={styles.focusButton} accessibilityRole="button" accessibilityLabel={`${task.title} için odaklanmayı başlat`}>
+          <Text style={styles.focusText}>◎ Odaklanmayı Başlat</Text>
+        </Pressable>
+      )}
       <CompletionSparkle trigger={sparkleTrigger} />
-    </Pressable>
+    </View>
   );
 }
 
@@ -106,4 +111,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   description: { marginTop: 5, lineHeight: 20, color: colors.textMuted, fontSize: 13 },
   timeBadge: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: radii.pill, backgroundColor: colors.surfaceRaised },
   minutes: { fontSize: 11, fontWeight: '700', color: colors.textMuted },
+  focusButton: {
+    alignSelf: 'flex-start', marginTop: 14, marginLeft: 41, paddingVertical: 7,
+    paddingHorizontal: 11, borderRadius: radii.pill, backgroundColor: colors.surfaceRaised,
+  },
+  focusText: { color: colors.accent, fontSize: 11, fontWeight: '700', letterSpacing: 0.2 },
 });

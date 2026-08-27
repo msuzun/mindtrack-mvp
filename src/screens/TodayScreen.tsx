@@ -1,14 +1,18 @@
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { EmptyStateView } from '../components/EmptyStateView';
 import { TaskCard } from '../components/TaskCard';
+import { ZenFocusModal } from '../components/ZenFocusModal';
 import { useAppStore } from '../store/useAppStore';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
+import { Task } from '../types';
 
 export function TodayScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const { tasks, loading, toggleTask, selectedDate, setTab } = useAppStore();
+  const [focusedTask, setFocusedTask] = useState<Task | null>(null);
 
   const completed = tasks.filter((x) => x.completed).length;
   const total = tasks.length;
@@ -59,9 +63,23 @@ export function TodayScreen() {
         <>
           <Text style={styles.sectionTitle}>Bugünkü görevler</Text>
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onToggle={() => void toggleTask(task)} />
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggle={() => void toggleTask(task)}
+              onFocus={() => setFocusedTask(task)}
+            />
           ))}
         </>
+      )}
+      {focusedTask && (
+        <ZenFocusModal
+          task={focusedTask}
+          onClose={() => setFocusedTask(null)}
+          onComplete={async () => {
+            if (!focusedTask.completed) await toggleTask(focusedTask);
+          }}
+        />
       )}
     </ScrollView>
   );
