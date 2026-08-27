@@ -4,6 +4,8 @@ export type PriorityLevel = 0 | 1 | 2;
 export type GoalStatus = 'active' | 'completed' | 'archived';
 export type RoutineFrequency = 'daily' | 'specific_days' | 'interval';
 export type TrainingSessionType = 'memory' | 'cognitive' | 'mindfulness' | 'free_focus';
+export type SmartSuggestionType = 'difficulty_increase' | 'difficulty_decrease' | 'reschedule' | 'load_balance';
+export type SmartSuggestionStatus = 'pending' | 'accepted' | 'dismissed';
 
 export type Goal = {
   id: string;
@@ -24,6 +26,17 @@ export type Routine = {
   intervalDays: number;
   isActive: boolean;
   createdAt: string;
+  defaultItemCount: number;
+  estimatedDurationMinutes: number;
+};
+
+export type SmartSuggestion = {
+  id: string;
+  type: SmartSuggestionType;
+  payload: Record<string, unknown>;
+  status: SmartSuggestionStatus;
+  createdAt: string;
+  message: string;
 };
 
 export type TaskInstance = {

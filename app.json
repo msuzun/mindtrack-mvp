@@ -2,14 +2,14 @@
   "expo": {
     "name": "MindTrack",
     "slug": "mindtrack",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "mindtrack",
     "icon": "./assets/app-icons/icon-zen-blue.png",
     "android": {
       "package": "com.sevkiuzun.mindtrack",
-      "versionCode": 23,
+      "versionCode": 24,
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.SCHEDULE_EXACT_ALARM"
@@ -21,7 +21,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.sevkiuzun.mindtrack",
-      "buildNumber": "23",
+      "buildNumber": "24",
       "supportsTablet": true,
       "icon": "./assets/app-icons/icon-zen-blue.png",
       "infoPlist": {

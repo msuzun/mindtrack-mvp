@@ -1,6 +1,14 @@
-# MindTrack v2.3.0
+# MindTrack v2.4.0
 
 MindTrack; hafıza, bilişsel gelişim, günlük görev ve odaklanma rutinlerini takip etmek için geliştirilmiş, tamamen cihaz üzerinde çalışan offline-first bir React Native / Expo uygulamasıdır.
+
+## v2.4.0 — Smart Planning
+
+- Kullanıcı onayı olmadan planı değiştirmeyen deterministik akıllı öneri motoru eklendi.
+- Son eğitim oturumlarına göre zorluk artırma/azaltma, geçmiş görev taşıma ve yoğun gün dengeleme önerileri oluşturuluyor.
+- Rutinlere varsayılan öğe sayısı ve tahmini süre alanları; öneri geçmişi için `smart_suggestions` tablosu eklendi.
+- Today ekranına Minimum/Normal/Yoğun gün etiketi ve 15/30/45 dakikalık yüksek etkili görev filtresi eklendi.
+- Öncelik, hedef bağlantısı, tahmini süre ve geçmiş verimli saatlere göre yerel akıllı sıralama uygulanıyor.
 
 ## v2.3.0 — Performance & Insights
 
