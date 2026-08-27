@@ -4,11 +4,13 @@ import { EmptyStateView } from '../components/EmptyStateView';
 import { TaskCard } from '../components/TaskCard';
 import { ZenFocusModal } from '../components/ZenFocusModal';
 import { TaskCustomizationModal } from '../components/TaskCustomizationModal';
+import { PerformanceInput, PerformanceInputSheet } from '../components/PerformanceInputSheet';
 import { useAppStore } from '../store/useAppStore';
 import { useTodayTasks } from '../hooks/useTodayTasks';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 import { Task } from '../types';
+import { TrainingSessionService } from '../services/TrainingSessionService';
 
 export function TodayScreen() {
   const { colors } = useTheme();
@@ -17,6 +19,35 @@ export function TodayScreen() {
   const setTab = useAppStore((state) => state.setTab);
   const [focusedTask, setFocusedTask] = useState<Task | null>(null);
   const [customizingTask, setCustomizingTask] = useState<Task | null>(null);
+  const [performanceTask, setPerformanceTask] = useState<Task | null>(null);
+  const [performanceDuration, setPerformanceDuration] = useState(0);
+  const [taskRenderNonce, setTaskRenderNonce] = useState(0);
+
+  const requestTaskToggle = async (task: Task) => {
+    if (task.completed) {
+      await toggleTask(task);
+      return;
+    }
+    setPerformanceDuration(0);
+    setPerformanceTask(task);
+  };
+
+  const completePerformanceTask = async (input?: PerformanceInput) => {
+    if (!performanceTask) return;
+    if (input) {
+      await TrainingSessionService.save({
+        taskInstanceId: performanceTask.id,
+        ...input,
+      });
+    }
+    await toggleTask(performanceTask);
+    setPerformanceTask(null);
+  };
+
+  const dismissPerformance = () => {
+    setPerformanceTask(null);
+    setTaskRenderNonce((value) => value + 1);
+  };
 
   const completed = tasks.filter((x) => x.completed).length;
   const total = tasks.length;
@@ -68,9 +99,9 @@ export function TodayScreen() {
           <Text style={styles.sectionTitle}>Bugünkü görevler</Text>
           {tasks.map((task) => (
             <TaskCard
-              key={task.id}
+              key={`${task.id}-${taskRenderNonce}`}
               task={task}
-              onToggle={() => void toggleTask(task)}
+              onToggle={() => void requestTaskToggle(task)}
               onFocus={() => setFocusedTask(task)}
               onCustomize={() => setCustomizingTask(task)}
             />
@@ -81,8 +112,9 @@ export function TodayScreen() {
         <ZenFocusModal
           task={focusedTask}
           onClose={() => setFocusedTask(null)}
-          onComplete={async () => {
-            if (!focusedTask.completed) await toggleTask(focusedTask);
+          onComplete={async (durationSeconds) => {
+            setPerformanceDuration(durationSeconds);
+            setPerformanceTask(focusedTask);
           }}
         />
       )}
@@ -93,6 +125,14 @@ export function TodayScreen() {
           onSaved={() => loadDay(selectedDate)}
         />
       )}
+      <PerformanceInputSheet
+        visible={Boolean(performanceTask)}
+        task={performanceTask}
+        initialDurationSeconds={performanceDuration}
+        onSave={completePerformanceTask}
+        onSkip={() => completePerformanceTask()}
+        onDismiss={dismissPerformance}
+      />
     </ScrollView>
   );
 }

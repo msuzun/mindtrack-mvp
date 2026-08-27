@@ -1,6 +1,14 @@
-# MindTrack v2.1.0
+# MindTrack v2.2.0
 
 MindTrack; hafıza, bilişsel gelişim, günlük görev ve odaklanma rutinlerini takip etmek için geliştirilmiş, tamamen cihaz üzerinde çalışan offline-first bir React Native / Expo uygulamasıdır.
+
+## v2.2.0 — Training Sessions
+
+- Hafıza, bilişsel, dinginlik ve serbest odak oturumlarını yerel SQLite üzerinde kaydeden eğitim seansı altyapısı eklendi.
+- Süre, doğru/yanlış, doğruluk, odak kalitesi ve kısa not girişi sunan kompakt bottom sheet oluşturuldu.
+- Performans girişi opsiyonel tutuldu; “Sadece Tamamla” ile görev tek dokunuşla bitirilebiliyor.
+- Zen sayacının ölçtüğü süre otomatik aktarılıyor ve sayaç bittiğinde sheet açılıyor.
+- Tüm hesaplama ve kayıt işlemleri çevrimdışı, cihaz içinde gerçekleştiriliyor.
 
 ## v2.1.0 — Goals & Routines Foundation
 

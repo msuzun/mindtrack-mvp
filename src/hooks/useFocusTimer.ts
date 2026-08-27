@@ -9,6 +9,7 @@ export function useFocusTimer(taskId: string, initialMode: FocusTimerMode = 25) 
   const initialSeconds = initialMode === 'stopwatch' ? 0 : initialMode * 60;
   const [seconds, setSeconds] = useState(initialSeconds);
   const [running, setRunning] = useState(false);
+  const [finished, setFinished] = useState(false);
   const startedAt = useRef<number | null>(null);
   const baseSeconds = useRef(initialSeconds);
   const secondsRef = useRef(initialSeconds);
@@ -38,6 +39,7 @@ export function useFocusTimer(taskId: string, initialMode: FocusTimerMode = 25) 
       setSeconds(next);
       if (mode !== 'stopwatch' && next === 0) {
         setRunning(false);
+        setFinished(true);
         void recordSession(mode * 60);
         void HapticService.taskCompleted();
       }
@@ -51,6 +53,7 @@ export function useFocusTimer(taskId: string, initialMode: FocusTimerMode = 25) 
     setRunning(false);
     setModeState(next);
     setSeconds(next === 'stopwatch' ? 0 : next * 60);
+    setFinished(false);
     recorded.current = false;
   };
 
@@ -58,8 +61,9 @@ export function useFocusTimer(taskId: string, initialMode: FocusTimerMode = 25) 
   const reset = () => {
     setRunning(false);
     setSeconds(mode === 'stopwatch' ? 0 : mode * 60);
+    setFinished(false);
     recorded.current = false;
   };
 
-  return { mode, seconds, running, setMode, toggle, reset, recordSession, elapsedSeconds };
+  return { mode, seconds, running, finished, setMode, toggle, reset, recordSession, elapsedSeconds };
 }
