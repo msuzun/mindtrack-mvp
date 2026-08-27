@@ -74,6 +74,8 @@ export function TaskCard({ task, onToggle, onFocus, onCustomize }: {
           <View style={styles.metaRow}>
             <CategoryPill tag={task.categoryTag ?? fallbackTag[task.category]} />
             <Text style={styles.legacyCategory}>{categoryLabel[task.category]}</Text>
+            {task.routineId && <Text style={styles.relationIcon} accessibilityLabel="Rutinden oluşturuldu">↻</Text>}
+            {task.goalTitle && <Text style={styles.goalBadge} numberOfLines={1}>◎ {task.goalTitle}</Text>}
           </View>
           <View style={styles.titleWrap}>
             <Text style={[styles.title, visualCompleted && styles.doneText]}>{task.title}</Text>
@@ -116,6 +118,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   content: { flex: 1, marginHorizontal: 13 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 7 },
   legacyCategory: { fontSize: 9, lineHeight: 13.5, fontWeight: '600', letterSpacing: 0.7, color: colors.textMuted },
+  relationIcon: { color: colors.success, fontSize: 13, lineHeight: 18, fontWeight: '700' },
+  goalBadge: { flexShrink: 1, color: colors.accent, fontSize: 9, lineHeight: 13.5, fontWeight: '600' },
   title: { fontSize: 16, fontWeight: '600', lineHeight: 24, letterSpacing: -0.15, color: colors.textPrimary },
   titleWrap: { alignSelf: 'stretch', position: 'relative' },
   doneText: { color: colors.textMuted },

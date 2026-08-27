@@ -2,11 +2,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 
-export type Tab = 'today' | 'plan' | 'progress' | 'settings' | 'about';
+export type Tab = 'today' | 'goals' | 'progress' | 'settings' | 'about';
 
 const tabs: Array<{ key: Tab; label: string; icon: string }> = [
   { key: 'today', label: 'Bugün', icon: '✓' },
-  { key: 'plan', label: 'Plan', icon: '□' },
+  { key: 'goals', label: 'Hedefler', icon: '◎' },
   { key: 'progress', label: 'İlerleme', icon: '↗' },
   { key: 'settings', label: 'Ayarlar', icon: '⚙' },
   { key: 'about', label: 'Hakkında', icon: 'i' },

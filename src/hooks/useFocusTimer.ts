@@ -4,7 +4,7 @@ import { HapticService } from '../services/HapticService';
 
 export type FocusTimerMode = 15 | 25 | 45 | 'stopwatch';
 
-export function useFocusTimer(taskId: number, initialMode: FocusTimerMode = 25) {
+export function useFocusTimer(taskId: string, initialMode: FocusTimerMode = 25) {
   const [mode, setModeState] = useState<FocusTimerMode>(initialMode);
   const initialSeconds = initialMode === 'stopwatch' ? 0 : initialMode * 60;
   const [seconds, setSeconds] = useState(initialSeconds);

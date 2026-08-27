@@ -1,6 +1,14 @@
-# MindTrack v1.x
+# MindTrack v2.1.0
 
 MindTrack; hafıza, bilişsel gelişim, günlük görev ve odaklanma rutinlerini takip etmek için geliştirilmiş, tamamen cihaz üzerinde çalışan offline-first bir React Native / Expo uygulamasıdır.
+
+## v2.1.0 — Goals & Routines Foundation
+
+- Eski görev listesi modeli hedef, rutin ve günlük görev örneği ilişkisine taşındı.
+- v1.x görevlerini kayıpsız aktaran ve eski tabloyu arşivleyen SQLite migration eklendi.
+- Aktif rutinlerden yalnızca gerekli günlerde görev üreten günlük materializer kuruldu.
+- Hedef ilerlemesini bağlı görevlerden hesaplayan yerel aggregation sorguları eklendi.
+- Günlük ekranın sadeliği korunurken Hedefler sekmesi ve hedef+rutin oluşturma akışı eklendi.
 
 ## v1.x serisi değişiklik özeti
 

@@ -1,14 +1,11 @@
 import { create } from 'zustand';
 import { Task } from '../types';
-import {
-  ensureTasksForDate,
-  getTasksForDate,
-  setTaskCompleted,
-} from '../db/database';
+import { getTasksForDate, setTaskCompleted } from '../db/database';
+import { RoutineSchedulerEngine } from '../services/RoutineSchedulerEngine';
 import { toLocalDateKey } from '../utils/date';
 import { NotificationService } from '../services/NotificationService';
 
-type Tab = 'today' | 'plan' | 'progress' | 'settings' | 'about';
+type Tab = 'today' | 'goals' | 'progress' | 'settings' | 'about';
 
 type AppState = {
   tab: Tab;
@@ -36,7 +33,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   loadDay: async (date = get().selectedDate) => {
     set({ loading: true, selectedDate: date });
-    await ensureTasksForDate(date);
+    await RoutineSchedulerEngine.materializeDate(date);
     const tasks = await getTasksForDate(date);
     set({ tasks, loading: false });
   },
