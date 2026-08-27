@@ -1,6 +1,14 @@
-# MindTrack v2.2.0
+# MindTrack v2.3.0
 
 MindTrack; hafıza, bilişsel gelişim, günlük görev ve odaklanma rutinlerini takip etmek için geliştirilmiş, tamamen cihaz üzerinde çalışan offline-first bir React Native / Expo uygulamasıdır.
+
+## v2.3.0 — Performance & Insights
+
+- Görev tamamlama disiplininden ayrı çalışan bilişsel gelişim analitiği eklendi.
+- Doğruluk trendi, hafıza kapasitesi, odak süresi ve hız–doğruluk ilişkisi yerel SQLite aggregation sorgularıyla hesaplanıyor.
+- Ana İçgörüler ekranı bilişsel skor, kapasite/odak ve alan dengesi olmak üzere yalnızca üç odak kartından oluşuyor.
+- Kural tabanlı gelişim, güçlü alan, gelişime açık alan ve sonraki antrenman önerileri oluşturuluyor.
+- Haftalık, aylık ve yıllık filtrelere sahip detay modalı ve hafif SVG sparkline eklendi.
 
 ## v2.2.0 — Training Sessions
 
