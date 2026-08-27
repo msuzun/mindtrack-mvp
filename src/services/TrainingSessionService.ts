@@ -1,5 +1,6 @@
 import { insertTrainingSession } from '../db/database';
 import { CreateTrainingSessionInput, TrainingSession } from '../types';
+import { RecordTrackerService } from './RecordTrackerService';
 
 function createId() {
   return `training-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -40,6 +41,7 @@ export const TrainingSessionService = {
       createdAt: new Date().toISOString(),
     };
     await insertTrainingSession(session);
+    await RecordTrackerService.checkTrainingSession(session);
     return session;
   },
 };

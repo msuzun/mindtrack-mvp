@@ -5,6 +5,7 @@ import { RoutineSchedulerEngine } from '../services/RoutineSchedulerEngine';
 import { toLocalDateKey } from '../utils/date';
 import { SmartNotificationScheduler } from '../services/SmartNotificationScheduler';
 import { ProgramManagerService } from '../services/ProgramManagerService';
+import { RecordTrackerService } from '../services/RecordTrackerService';
 
 type Tab = 'today' | 'goals' | 'progress' | 'settings' | 'about';
 
@@ -48,6 +49,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     await get().loadDay(task.date);
     const programGraduation = await ProgramManagerService.evaluateMilestones();
     if (programGraduation) set({ programGraduation });
+    await RecordTrackerService.checkDiscipline();
     await SmartNotificationScheduler.cancelTodayIfComplete();
   },
 }));

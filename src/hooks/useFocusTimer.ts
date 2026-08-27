@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { saveFocusSession } from '../db/database';
 import { HapticService } from '../services/HapticService';
+import { RecordTrackerService } from '../services/RecordTrackerService';
 
 export type FocusTimerMode = 15 | 25 | 45 | 'stopwatch';
 
@@ -25,6 +26,7 @@ export function useFocusTimer(taskId: string, initialMode: FocusTimerMode = 25) 
     if (recorded.current || duration <= 0) return;
     recorded.current = true;
     await saveFocusSession(taskId, duration);
+    await RecordTrackerService.checkFocusSession(duration);
   }, [elapsedSeconds, taskId]);
 
   useEffect(() => {

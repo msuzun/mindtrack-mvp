@@ -31,6 +31,16 @@ export type ProgramGraduationSummary = {
   enrollmentId: string; title: string; totalItems: number; focusMinutes: number;
   accuracyChange: number | null; badge: string;
 };
+export type PersonalRecordType = 'max_items' | 'peak_accuracy' | 'longest_focus' | 'best_streak_week';
+export type PersonalRecord = { id: string; recordType: PersonalRecordType; value: number; achievedAt: string; sessionId: string | null };
+export type ReviewPeriodType = 'weekly' | 'monthly';
+export type ReviewMetrics = {
+  periodStart: string; periodEnd: string; consistencyRate: number; focusMinutes: number; completedSessions: number;
+  peakMoment: string | null; currentAccuracy: number | null; previousAccuracy: number | null;
+  ninetyDayAccuracy: number | null; accuracyDelta: number | null;
+};
+export type BenchmarkType = 'memory_capacity' | 'logical_speed';
+export type Benchmark = { id: string; benchmarkType: BenchmarkType; score: number; baselineComparisonDelta: number; takenAt: string };
 
 export type NotificationSettings = {
   enabled: boolean;
