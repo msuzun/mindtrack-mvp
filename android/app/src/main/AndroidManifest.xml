@@ -23,10 +23,6 @@
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
     <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode|smallestScreenSize|assetsPaths" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:theme="@style/Theme.App.SplashScreen" android:exported="true" android:screenOrientation="portrait">
       <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
-      </intent-filter>
-      <intent-filter>
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
@@ -34,5 +30,17 @@
         <data android:scheme="exp+mindtrack"/>
       </intent-filter>
     </activity>
+    <activity-alias android:name=".IconZenBlue" android:enabled="true" android:exported="true" android:icon="@drawable/icon_zen_blue" android:roundIcon="@drawable/icon_zen_blue" android:targetActivity=".MainActivity">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity-alias>
+    <activity-alias android:name=".IconMidnight" android:enabled="false" android:exported="true" android:icon="@drawable/icon_midnight" android:roundIcon="@drawable/icon_midnight" android:targetActivity=".MainActivity">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity-alias>
+    <activity-alias android:name=".IconPureLight" android:enabled="false" android:exported="true" android:icon="@drawable/icon_pure_light" android:roundIcon="@drawable/icon_pure_light" android:targetActivity=".MainActivity">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity-alias>
+    <activity-alias android:name=".IconSolarSunset" android:enabled="false" android:exported="true" android:icon="@drawable/icon_solar_sunset" android:roundIcon="@drawable/icon_solar_sunset" android:targetActivity=".MainActivity">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity-alias>
   </application>
 </manifest>
