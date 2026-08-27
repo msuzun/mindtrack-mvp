@@ -185,6 +185,23 @@ async function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS idx_smart_suggestions_status_created
     ON smart_suggestions(status, created_at);
 
+    CREATE TABLE IF NOT EXISTS programs (
+      id TEXT PRIMARY KEY NOT NULL, title TEXT NOT NULL, description TEXT NOT NULL,
+      category TEXT NOT NULL CHECK (category IN ('memory','focus','logic','mindfulness')),
+      duration_weeks INTEGER NOT NULL CHECK (duration_weeks > 0),
+      level TEXT NOT NULL CHECK (level IN ('beginner','intermediate','advanced')),
+      curriculum_json TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS user_enrolled_programs (
+      id TEXT PRIMARY KEY NOT NULL, program_id TEXT NOT NULL, goal_id TEXT NOT NULL,
+      start_date TEXT NOT NULL, current_week INTEGER NOT NULL DEFAULT 1,
+      status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','paused','completed')),
+      paused_at TEXT, completed_at TEXT,
+      FOREIGN KEY (program_id) REFERENCES programs(id), FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_enrolled_programs_status ON user_enrolled_programs(status);
+    CREATE INDEX IF NOT EXISTS idx_enrolled_programs_goal ON user_enrolled_programs(goal_id);
+
     CREATE TABLE IF NOT EXISTS notification_settings (
       id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
       enabled INTEGER NOT NULL DEFAULT 0 CHECK (enabled IN (0, 1)),
@@ -202,9 +219,11 @@ async function initializeDatabase() {
 
   await ensureColumn(db, 'routines', 'default_item_count', 'INTEGER NOT NULL DEFAULT 30');
   await ensureColumn(db, 'routines', 'estimated_duration_minutes', 'INTEGER NOT NULL DEFAULT 20');
+  await ensureColumn(db, 'routines', 'program_enrollment_id', 'TEXT');
+  await ensureColumn(db, 'routines', 'program_week', 'INTEGER');
 
   await db.runAsync(
-    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.5.0')
+    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.6.0')
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`
   );
 
@@ -236,6 +255,11 @@ async function initializeDatabase() {
 export function initDatabase() {
   initialization ??= initializeDatabase();
   return initialization;
+}
+
+export async function getDatabase() {
+  await initDatabase();
+  return dbPromise;
 }
 
 export type ReminderSettings = { enabled: boolean; hour: number; minute: number };
@@ -418,7 +442,10 @@ export async function insertTrainingSession(session: TrainingSession) {
 export async function getActiveRoutines(): Promise<Routine[]> {
   await initDatabase();
   const db = await dbPromise;
-  const rows = await db.getAllAsync<any>('SELECT * FROM routines WHERE is_active = 1 ORDER BY sort_order, created_at');
+  const rows = await db.getAllAsync<any>(
+    `SELECT r.*,e.start_date AS program_start_date,e.status AS program_status
+     FROM routines r LEFT JOIN user_enrolled_programs e ON e.id=r.program_enrollment_id
+     WHERE r.is_active=1 ORDER BY r.sort_order,r.created_at`);
   return rows.map(mapRoutine);
 }
 
@@ -431,6 +458,8 @@ function mapRoutine(row: any): Routine {
     isActive: row.is_active === 1, createdAt: row.created_at,
     defaultItemCount: row.default_item_count ?? 30,
     estimatedDurationMinutes: row.estimated_duration_minutes ?? row.target_minutes ?? 20,
+    programEnrollmentId: row.program_enrollment_id ?? null, programWeek: row.program_week ?? null,
+    programStartDate: row.program_start_date ?? null, programStatus: row.program_status ?? null,
   };
 }
 

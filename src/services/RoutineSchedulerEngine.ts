@@ -16,6 +16,11 @@ function daysBetween(startIso: string, dateKey: string) {
 
 function shouldRun(routine: Routine, dateKey: string) {
   if (!routine.isActive) return false;
+  if (routine.programEnrollmentId) {
+    if (routine.programStatus !== 'active' || !routine.programStartDate || !routine.programWeek) return false;
+    const weekStart = addDays(routine.programStartDate, (routine.programWeek - 1) * 7);
+    if (dateKey < weekStart || dateKey > addDays(weekStart, 6)) return false;
+  }
   if (routine.frequencyType === 'daily') return true;
   if (routine.frequencyType === 'specific_days') return routine.daysOfWeek.includes(isoWeekday(dateKey));
   return daysBetween(routine.createdAt, dateKey) % Math.max(1, routine.intervalDays) === 0;

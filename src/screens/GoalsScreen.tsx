@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { GoalCard } from '../components/GoalCard';
 import { createGoal, getGoalsOverview } from '../db/database';
 import { SmartNotificationScheduler } from '../services/SmartNotificationScheduler';
@@ -7,7 +7,12 @@ import { useAppStore } from '../store/useAppStore';
 import { radii, spacing, ThemeColors } from '../theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeProvider';
 import { GoalOverview, RoutineFrequency } from '../types';
+import { UserEnrolledProgram } from '../types';
 import { toLocalDateKey } from '../utils/date';
+import { ProgramsExploreScreen } from './ProgramsExploreScreen';
+import { ActiveProgramCard } from '../components/ActiveProgramCard';
+import { ProgramGraduationModal } from '../components/ProgramGraduationModal';
+import { ProgramManagerService } from '../services/ProgramManagerService';
 
 const weekdays = [[1, 'Pzt'], [2, 'Sal'], [3, 'Çar'], [4, 'Per'], [5, 'Cum'], [6, 'Cmt'], [7, 'Paz']] as const;
 
@@ -15,15 +20,25 @@ export function GoalsScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const loadDay = useAppStore((state) => state.loadDay);
+  const graduation = useAppStore((state) => state.programGraduation);
+  const setGraduation = useAppStore((state) => state.setProgramGraduation);
   const [goals, setGoals] = useState<GoalOverview[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [section, setSection] = useState<'goals' | 'programs'>('goals');
+  const [enrollments, setEnrollments] = useState<UserEnrolledProgram[]>([]);
 
   const load = async () => {
-    setGoals(await getGoalsOverview());
+    const [nextGoals, nextEnrollments] = await Promise.all([getGoalsOverview(), ProgramManagerService.getEnrollments()]);
+    setGoals(nextGoals); setEnrollments(nextEnrollments);
     setLoading(false);
   };
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void (async () => { await load(); const summary = await ProgramManagerService.evaluateMilestones(); if (summary) { setGraduation(summary); await load(); } })(); }, []);
+
+  const changeEnrollment = async (enrollment: UserEnrolledProgram) => {
+    try { if (enrollment.status === 'active') await ProgramManagerService.pause(enrollment.id); else await ProgramManagerService.resume(enrollment.id); await load(); }
+    catch (error) { const message = error instanceof Error ? error.message : 'İşlem tamamlanamadı.'; Alert.alert('Program güncellenemedi', message); }
+  };
 
   return <>
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -32,7 +47,9 @@ export function GoalsScreen() {
         <View style={styles.titleCopy}><Text style={styles.title}>Hedefler</Text><Text style={styles.subtitle}>Yönünü belirle; bugün yalnızca sıradaki küçük adıma odaklan.</Text></View>
         <Pressable onPress={() => setModalVisible(true)} style={styles.addButton} accessibilityRole="button"><Text style={styles.addText}>＋</Text></Pressable>
       </View>
-      {loading ? <ActivityIndicator color={colors.accent} style={styles.loader} /> : goals.length === 0 ? <View style={styles.empty}>
+      <View style={styles.sectionSwitch}><Pressable onPress={() => setSection('goals')} style={[styles.sectionOption, section === 'goals' && styles.sectionOptionActive]}><Text style={[styles.sectionOptionText, section === 'goals' && styles.sectionOptionTextActive]}>Hedeflerim</Text></Pressable><Pressable onPress={() => setSection('programs')} style={[styles.sectionOption, section === 'programs' && styles.sectionOptionActive]}><Text style={[styles.sectionOptionText, section === 'programs' && styles.sectionOptionTextActive]}>Program Akademisi</Text></Pressable></View>
+      {enrollments.filter((item) => item.status !== 'completed').length > 0 && <View style={styles.activePrograms}><Text style={styles.activeTitle}>AKTİF PROGRAMLAR</Text>{enrollments.filter((item) => item.status !== 'completed').map((item) => <ActiveProgramCard key={item.id} enrollment={item} onPause={() => void changeEnrollment(item)} onResume={() => void changeEnrollment(item)} />)}</View>}
+      {section === 'programs' ? <ProgramsExploreScreen onEnrolled={async () => { await load(); await loadDay(toLocalDateKey()); }} /> : loading ? <ActivityIndicator color={colors.accent} style={styles.loader} /> : goals.length === 0 ? <View style={styles.empty}>
         <Text style={styles.emptyTitle}>İlk yönünü belirle</Text>
         <Text style={styles.emptyText}>Bir hedef ve ona hizmet eden küçük bir rutin ekleyerek başla.</Text>
         <Pressable onPress={() => setModalVisible(true)} style={styles.emptyButton}><Text style={styles.emptyButtonText}>Hedef Ekle</Text></Pressable>
@@ -41,6 +58,7 @@ export function GoalsScreen() {
     <CreateGoalModal visible={modalVisible} onClose={() => setModalVisible(false)} onSaved={async () => {
       await load(); await loadDay(toLocalDateKey());
     }} />
+    <ProgramGraduationModal summary={graduation} onClose={() => setGraduation(null)} />
   </>;
 }
 
@@ -78,6 +96,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   content: { paddingHorizontal: spacing.screen, paddingTop: 22, paddingBottom: 38 }, eyebrow: { color: colors.accent, fontSize: 10, lineHeight: 15, fontWeight: '700', letterSpacing: 1.3 },
   titleRow: { flexDirection: 'row', alignItems: 'center', marginTop: 7, marginBottom: 24 }, titleCopy: { flex: 1 }, title: { color: colors.textPrimary, fontSize: 30, lineHeight: 39, fontWeight: '600' },
   subtitle: { color: colors.textMuted, fontSize: 13, lineHeight: 19.5, marginTop: 3, paddingRight: 12 }, addButton: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent }, addText: { color: colors.onAccent, fontSize: 24, lineHeight: 28, fontWeight: '500' }, loader: { marginTop: 50 },
+  sectionSwitch: { flexDirection: 'row', padding: 4, marginBottom: 18, borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }, sectionOption: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 9 }, sectionOptionActive: { backgroundColor: colors.accent }, sectionOptionText: { color: colors.textMuted, fontSize: 11, fontWeight: '700' }, sectionOptionTextActive: { color: colors.onAccent }, activePrograms: { marginBottom: 18 }, activeTitle: { color: colors.textMuted, fontSize: 9, fontWeight: '800', letterSpacing: 1, marginBottom: 8 },
   empty: { alignItems: 'center', padding: 28, borderRadius: radii.card, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }, emptyTitle: { color: colors.textPrimary, fontSize: 18, lineHeight: 27, fontWeight: '600' }, emptyText: { color: colors.textMuted, fontSize: 13, lineHeight: 19.5, textAlign: 'center', marginTop: 7 }, emptyButton: { marginTop: 18, paddingHorizontal: 16, paddingVertical: 10, borderRadius: radii.pill, backgroundColor: colors.accent }, emptyButtonText: { color: colors.onAccent, fontSize: 12, lineHeight: 18, fontWeight: '700' },
   overlay: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: colors.modalOverlay }, modal: { padding: 20, borderRadius: 20, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }, modalTitle: { color: colors.textPrimary, fontSize: 21, lineHeight: 31.5, fontWeight: '600', marginBottom: 14 },
   input: { minHeight: 47, marginBottom: 9, paddingHorizontal: 13, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, color: colors.textPrimary, fontSize: 13 }, placeholder: { color: colors.textMuted }, fieldLabel: { color: colors.textMuted, fontSize: 10, lineHeight: 15, fontWeight: '700', letterSpacing: 1, marginTop: 8, marginBottom: 8 },
