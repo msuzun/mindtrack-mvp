@@ -18,6 +18,8 @@ import { TimeBudget, useTimeBudgetFilter } from '../hooks/useTimeBudgetFilter';
 import { HapticService } from '../services/HapticService';
 import { BestNextStepCard } from '../components/BestNextStepCard';
 import { getBestNextTask } from '../db/database';
+import { PersonalCoachCard } from '../components/PersonalCoachCard';
+import { useCoachInsights } from '../hooks/useCoachInsights';
 
 const TIME_FILTERS: Array<{ value: TimeBudget; label: string }> = [
   { value: null, label: 'Tümü' }, { value: 15, label: '15 dk' }, { value: 30, label: '30 dk' }, { value: 45, label: '45 dk' },
@@ -39,6 +41,7 @@ export function TodayScreen() {
   const [suggestionBusy, setSuggestionBusy] = useState(false);
   const [bestNextTask, setBestNextTask] = useState<Task | null>(null);
   const { visibleTasks, hiddenCount, capacityMode } = useTimeBudgetFilter(tasks, timeBudget);
+  const coach = useCoachInsights();
 
   useEffect(() => {
     if (loading) return;
@@ -125,6 +128,7 @@ export function TodayScreen() {
       </View>
 
       <BestNextStepCard task={bestNextTask} onStart={setFocusedTask} />
+      {coach.insights[0] && <PersonalCoachCard insight={coach.insights[0]} busy={coach.busyId === coach.insights[0].id} onApply={() => void coach.apply(coach.insights[0]!).then(() => loadDay(selectedDate))} onDismiss={() => void coach.dismiss(coach.insights[0]!)} />}
 
       {suggestion && <SmartSuggestionBanner suggestion={suggestion} busy={suggestionBusy} onApply={() => void applySuggestion('today')} onAlternative={() => void applySuggestion('next_light')} onDismiss={() => void dismissSuggestion()} />}
 

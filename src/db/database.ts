@@ -220,6 +220,9 @@ async function initializeDatabase() {
     );
     CREATE INDEX IF NOT EXISTS idx_reviews_period ON periodic_reviews(period_type,period_end);
     CREATE INDEX IF NOT EXISTS idx_benchmarks_type_taken ON benchmarks(benchmark_type,taken_at);
+    CREATE TABLE IF NOT EXISTS coach_insight_state (insight_id TEXT PRIMARY KEY NOT NULL,dismissed_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS rest_days (date TEXT PRIMARY KEY NOT NULL,reason TEXT,created_at TEXT NOT NULL);
+    CREATE INDEX IF NOT EXISTS idx_rest_days_date ON rest_days(date);
 
     CREATE TABLE IF NOT EXISTS notification_settings (
       id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
@@ -242,7 +245,7 @@ async function initializeDatabase() {
   await ensureColumn(db, 'routines', 'program_week', 'INTEGER');
 
   await db.runAsync(
-    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.7.0')
+    `INSERT INTO app_settings (key, value) VALUES ('schema_version', '2.8.0')
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`
   );
 
@@ -279,6 +282,11 @@ export function initDatabase() {
 export async function getDatabase() {
   await initDatabase();
   return dbPromise;
+}
+
+export async function isRestDay(date: string) {
+  const db = await getDatabase();
+  return Boolean(await db.getFirstAsync('SELECT 1 FROM rest_days WHERE date=?', date));
 }
 
 export type ReminderSettings = { enabled: boolean; hour: number; minute: number };

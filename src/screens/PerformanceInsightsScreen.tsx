@@ -8,6 +8,8 @@ import { useThemedStyles } from '../theme/ThemeProvider';
 import { ProgressScreen } from './ProgressScreen';
 import { PersonalRecordsGrid } from '../components/PersonalRecordsGrid';
 import { MonthlyReviewModal } from '../components/MonthlyReviewModal';
+import { PersonalCoachCard } from '../components/PersonalCoachCard';
+import { useCoachInsights } from '../hooks/useCoachInsights';
 
 type DetailKind = 'cognitive' | 'capacity' | 'areas';
 type DashboardData = { cognitive: CognitiveAccuracyStats; capacity: CapacityFocusStats; areas: StrengthWeaknessStats };
@@ -77,6 +79,7 @@ export function PerformanceInsightsScreen() {
   const [detail, setDetail] = useState<DetailKind | null>(null);
   const [disciplineVisible, setDisciplineVisible] = useState(false);
   const [reviewVisible, setReviewVisible] = useState(false);
+  const coach = useCoachInsights();
   const load = useCallback(async () => setData(await loadDashboard('weekly')), []);
   useEffect(() => { void load(); }, [load]);
   const insight = data ? calculateProgressInsights(data.cognitive, data.areas.strength, data.areas.opportunity) : null;
@@ -94,6 +97,7 @@ export function PerformanceInsightsScreen() {
         <CapacityFocusCard data={data.capacity} onDetail={setDetail} />
         <AreaAnalysisCard data={data.areas} insight={insight} onDetail={setDetail} />
       </>}
+      {coach.insights.map((item) => <PersonalCoachCard key={item.id} insight={item} busy={coach.busyId === item.id} onApply={() => void coach.apply(item).then(load)} onDismiss={() => void coach.dismiss(item)} />)}
       <Text style={styles.privacy}>İçgörüler yalnızca cihazındaki eğitim verilerinden hesaplanır.</Text>
     </ScrollView><DetailModal kind={detail} onClose={() => setDetail(null)} /><DisciplineModal visible={disciplineVisible} onClose={() => setDisciplineVisible(false)} /><MonthlyReviewModal visible={reviewVisible} onClose={() => setReviewVisible(false)} />
   </>;
