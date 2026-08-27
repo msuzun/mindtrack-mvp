@@ -41,6 +41,12 @@ export type ReviewMetrics = {
 };
 export type BenchmarkType = 'memory_capacity' | 'logical_speed';
 export type Benchmark = { id: string; benchmarkType: BenchmarkType; score: number; baselineComparisonDelta: number; takenAt: string };
+export type CoachInsightCategory = 'balance' | 'speed_accuracy' | 'schedule' | 'recovery';
+export type CoachActionType = 'reduce_load' | 'increase_difficulty' | 'reschedule_routine' | 'set_rest_day' | 'update_goal';
+export type CoachInsight = {
+  id: string; category: CoachInsightCategory; insightText: string; recommendedActionText: string;
+  actionType: CoachActionType; actionPayload: Record<string, unknown>; priority: number; createdAt: string;
+};
 
 export type NotificationSettings = {
   enabled: boolean;

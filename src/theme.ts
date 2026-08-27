@@ -13,6 +13,7 @@ export const darkColors = {
   tagWorkBg: 'rgba(56, 189, 248, 0.15)', tagWorkText: '#38bdf8',
   tagRoutineBg: 'rgba(251, 146, 60, 0.15)', tagRoutineText: '#fb923c',
   priorityImportant: '#f59e0b', priorityUrgent: '#fb7185',
+  coachAccent: '#c084fc',
 } as const;
 
 export const lightColors = {
@@ -30,6 +31,7 @@ export const lightColors = {
   tagWorkBg: 'rgba(2, 132, 199, 0.10)', tagWorkText: '#0369a1',
   tagRoutineBg: 'rgba(217, 119, 6, 0.10)', tagRoutineText: '#b45309',
   priorityImportant: '#d97706', priorityUrgent: '#e11d48',
+  coachAccent: '#7e22ce',
 } as const;
 
 export type ThemeMode = 'system' | 'dark' | 'light';

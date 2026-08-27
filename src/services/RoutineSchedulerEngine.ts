@@ -1,4 +1,4 @@
-import { getActiveRoutines, insertRoutineTask } from '../db/database';
+import { getActiveRoutines, insertRoutineTask, isRestDay } from '../db/database';
 import { Routine } from '../types';
 import { addDays } from '../utils/date';
 
@@ -28,6 +28,7 @@ function shouldRun(routine: Routine, dateKey: string) {
 
 export const RoutineSchedulerEngine = {
   async materializeDate(dateKey: string) {
+    if (await isRestDay(dateKey)) return;
     const routines = await getActiveRoutines();
     const scheduled = routines.filter((routine) => shouldRun(routine, dateKey));
     await Promise.all(scheduled.map((routine) => insertRoutineTask(routine, dateKey)));
